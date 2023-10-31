@@ -1,4 +1,8 @@
+/* eslint-disable */
 
-export function test_this( ns ) {
-	ns.tprint( "SUccess!")
+import {NS} from "./NetscriptDefinitions"
+
+/** @param {NS} ns  */
+export async function main( ns ) {
+	
 }

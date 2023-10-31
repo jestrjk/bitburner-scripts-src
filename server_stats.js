@@ -1,4 +1,3 @@
-/* eslint-disable */
 import * as lib_args from 'lib_argumentProcessor.js'
 
 /** @param {NS} ns */
@@ -87,7 +86,10 @@ export async function main(ns) {
 		await ns.sleep( 1000 )
 	}	// while(true)
 
-	function get_servers( all_servers, target_server ) {
+	function get_servers( all_servers, target_server, recurse_to ) {
+
+		recurse_to -= 1
+		if ( recurse_to < 0 ) return ;
 
 		let new_server_list = ns.scan( target_server )  
 
