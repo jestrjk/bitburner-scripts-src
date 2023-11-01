@@ -17,6 +17,7 @@ export async function main(ns : NS) {
 	for( let script_host_name of script_host_names) {
 		if ( ns.serverExists( script_host_name ) ) {
 			killRunningLiteScripts(ns, script_host_name ) ;
+			installHackingScripts( ns,script_host_name )
 		}
 	}
 
@@ -104,6 +105,11 @@ export async function main(ns : NS) {
 			} else {
 				return false ;
 			}
+		}
+
+		function installHackingScripts( ns: NS,script_host_name: string ) {
+			let lite_script_names_values = Object.values( lite_script_names )
+				ns.scp( lite_script_names_values, script_host_name, 'home' )
 		}
 
 		function hostHasEnoughRam( script_host_name, host_max_ram, script_name, threads ) {
