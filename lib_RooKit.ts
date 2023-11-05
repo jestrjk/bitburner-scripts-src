@@ -1,6 +1,5 @@
 /* eslint-disable */
-
-import { notStrictEqual } from "assert";
+import { colors } from "./lib_utils"
 import {NS, Server} from "./NetscriptDefinitions"
 
 export class RootKit {
@@ -18,9 +17,16 @@ export class RootKit {
   run () {
     if ( this.target_server.hasAdminRights ) return true
 
+    
+    let hack_level = this.ns.getHackingLevel()
+    this.ns.print( `hacking ${hack_level} / ${this.target_server.requiredHackingSkill??9999999}`)
+    if ((this.target_server.requiredHackingSkill ?? 9999999) > hack_level  ) return false
+    this.ns.print( `passed hacking level check`)
     this.port_hacker.run( this.target_server.hostname )
+    this.target_server = this.ns.getServer( this.target_server.hostname )
 
     if ( (this.target_server.numOpenPortsRequired ?? 0) > ( this.target_server.openPortCount ?? 0) ) {
+      this.ns.print( `returning because ports open / ports required: ${colors.brightRed}${this.target_server.openPortCount} / ${this.target_server.numOpenPortsRequired}` )
       return false
     }
 
@@ -52,34 +58,35 @@ export class PortHackingPrograms {
 
   get_active_programs() {
     for ( const program_name of this.program_list ) {
-    
+
       if ( this.ns.fileExists( program_name ) ) {
+        this.ns.print( `[port_hacking] ${colors.brightGreen}${program_name}`)
         this.active_programs.push ( program_name ) 
-      } else { this.ns.print( `[port_hacking] Can't find ${program_name}`)} 
-  
+      } else { this.ns.print( `[port_hacking] ${colors.brightRed}${program_name}`)} 
+
     }
   }	
 
-  run( server ) {
+  run( server_name: string ) {
     for ( const program_name of this.active_programs ) {
       switch ( program_name ) {
         case "BruteSSH.exe":
-          this.ns.brutessh( server )
+          this.ns.brutessh( server_name )
           break;
         case "FTPCrack.exe":
-          this.ns.ftpcrack( server )
+          this.ns.ftpcrack( server_name )
           break;
         case "relaySMTP.exe":
-          this.ns.relaysmtp( server )
+          this.ns.relaysmtp( server_name )
           break;
         case "HTTPWorm.exe":
-          this.ns.httpworm( server )
+          this.ns.httpworm( server_name )
           break;
         case "SQLInject.exe":
-          this.ns.sqlinject( server )
+          this.ns.sqlinject( server_name )
           break;
         default:
-          throw new Error( `[${server}] Invalid program name to execute: ${program_name} `)
+          throw new Error( `[${server_name}] Invalid program name to execute: ${program_name} `)
       }
     }
   }

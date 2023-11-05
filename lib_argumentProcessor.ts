@@ -1,8 +1,15 @@
+/* eslint-disable */
+
+interface Arguments {
+	options: { [key: string]: string }
+	args: (number | string)[]
+}
+
 /** @param {NS} ns */
 export function processArguments( ns ) {
 	let args = ns.args ;
 
-	let processed_args = {
+	let processed_args: Arguments = {
 		options:  {},
 		args:			[]
 	} ;

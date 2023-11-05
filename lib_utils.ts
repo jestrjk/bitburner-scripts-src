@@ -13,7 +13,8 @@ import {NS} from "./NetscriptDefinitions"
 * */
 export function toPercent ( amount: number) { return amount/100 }
 
-export function toMillions( amount: number ) { return amount/1000000 } 
+export function toMillions( amount: number ): number { return amount/1000000 } 
+export function toMillionsFormatted( amount: number ): string { return `$${(amount/1000000).toFixed(1)}m` }
 export function toBillions( amount: number ) { return amount/1000000000 } 
 
 /** @param seconds amount (of seconds) to convert to minutes */
@@ -39,6 +40,5 @@ export const colors = {
   brightBlue: "\u001b[34;1m",
   brightMagenta: "\u001b[35;1m",
   brightCyan: "\u001b[36;1m",
-  brightWhite: "\u001b[37;1m",
   reset: "\u001b[0m"
 };

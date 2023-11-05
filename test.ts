@@ -5,9 +5,9 @@ import { ServerList } from "./lib_ServerList"
 
 export async function main( ns: NS ) {
 
-  let l = new ServerList(ns, 'home' )
+  let l = await ServerList.build( ns ) 
 
-  ns.tprint( l.all_server_names )
+  ns.tprint( l )
 
   let x = 12 ;
 }

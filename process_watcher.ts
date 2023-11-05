@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {NS, ProcessInfo} from "./NetscriptDefinitions"
-import {ScriptHosts} from "././lib_ScriptHosts"
+import {getAllServersAndNames} from "./lib_ServerList"
 
 interface CustomProcessInfo extends ProcessInfo {
   target_server_name:     string
@@ -15,14 +15,12 @@ interface CustomProcessInfo extends ProcessInfo {
 export async function main ( ns: NS ) {
   ns.tail() 
 
+  let { all_script_host_names, all_server_names, all_servers } = await getAllServersAndNames(ns, 'home')
   while ( true ) {
-    let script_hosts = new ScriptHosts(ns)
     let proc_data: CustomProcessInfo[] = []
-
-    getExtendedProcessInfo(script_hosts, proc_data)
+    getExtendedProcessInfo(all_script_host_names, proc_data)
     
     proc_data.sort( (procA, procB) => (procA.run_time_left - procB.run_time_left) )
-
     printExtendedProcessData(proc_data)
     
     await ns.sleep( 1000 )
@@ -42,9 +40,9 @@ export async function main ( ns: NS ) {
     }
   }
 
-  function getExtendedProcessInfo(script_hosts: ScriptHosts, proc_data: CustomProcessInfo[] ) {
+  function getExtendedProcessInfo(script_host_names: string[], proc_data: CustomProcessInfo[] ) {
     
-    for( let script_host_name of script_hosts.script_host_names ) {
+    for( let script_host_name of script_host_names ) {
       for (let proc of ns.ps(script_host_name) ) {
         if ( ! proc.filename.startsWith( `lite_`) ) continue
       
