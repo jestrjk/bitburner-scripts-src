@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { NS, Server } from "./NetscriptDefinitions"
+import { NS, Server } from './NetscriptDefinitions'
 
 // interface Server_Data_Extended {
 //   grow: any,
@@ -32,9 +32,9 @@ async function getAllServers( ns: NS, target_host_name = 'home', all_servers: Se
       all_server_names.push( new_server_name ) 
       await getAllServers( ns, new_server_name, all_servers, all_server_names )
     }
-    await ns.sleep( 50 )
   }
 }
+
 
 function getScriptHostNames( all_server_names: string[] ) {
     

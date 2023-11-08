@@ -2,22 +2,25 @@
 import {NS} from "./NetscriptDefinitions" 
 
 let Commands = {
-  buy: "buy",
+  purchase: "purchase",
   upgrade: "upgrade",
   upgrade_cost: "upgrade_cost",
   purchase_costs: "purchase_costs",
   default: "default",
 }
 
-let server_sizes = [ 8, 16, 32, 64, 128, 256 ]
+let server_sizes = [ 64, 128, 256, 512, 1024, 2048 ]
 
 export async function main ( ns: NS ) {
-
   let command_arg = ns.args.shift()?.toString() ?? Commands.default
   
+  ns.tail()
+
+  ns.print( `Your Money: ${ns.formatNumber(ns.getPlayer().money,1)}`)
+  
   switch ( command_arg ) {
-    case Commands.buy:
-      buy();              break ;
+    case Commands.purchase:
+      purchase();              break ;
     case Commands.upgrade:
       upgrade() ;         break ;
     case Commands.upgrade_cost:
@@ -25,18 +28,19 @@ export async function main ( ns: NS ) {
     
     default: 
     case Commands.purchase_costs: 
-      printServerCosts(); 
-      printPurchasedServers() ;
+      ns.print( `Bad command: ${command_arg}`)
+      printPurchasedServerCosts() ;
+      printMyPurchasedServers() ;
     break ;
   }
 
   function upgrade_cost() {
     let hostname: string  = ns.args.shift() as string
     let ram: number       = ns.args.shift() as number
-    ns.tprint ( `upgrade <hostname>:${hostname} <ram>:${ram}`)
+    ns.print ( `upgrade <hostname>:${hostname} <ram>:${ram}`)
     
     let cost = ns.getPurchasedServerUpgradeCost( hostname, ram ) 
-    ns.tprint( `Cost to upgrade ${hostname} to ${ram}: ${millions(cost)}m`)
+    ns.print( `Cost to upgrade ${hostname} to ${ram}: ${millions(cost)}m`)
   }
 
   function upgrade() {
@@ -44,36 +48,40 @@ export async function main ( ns: NS ) {
     let ram: number       = ns.args.shift() as number
 
     let results = ns.upgradePurchasedServer( hostname, ram ) 
-    ns.tprint( title(`Results`))
-    ns.tprint( `UPGRADE attempt: ${results ? "succeeded" : "failed"}`)
-    printPurchasedServers()
+    ns.print( title(`Results`))
+    ns.print( `UPGRADE attempt: ${results ? "succeeded" : "failed"}`)
+    printMyPurchasedServers()
   }
   
   // Function DEFS
-  function buy() {
+  function purchase() {
     let hostname: string  = ns.args.shift() as string
     let ram: number       = ns.args.shift() as number
-    ns.tprint ( `upgrade <hostname>:${hostname} <ram>:${ram}`)
+    ns.print ( `upgrade <hostname>:${hostname} <ram>:${ram}`)
 
-    ns.tprint( title(`Results`))
+    ns.print( title(`Results`))
     let results = ns.purchaseServer(hostname, ram)
-    ns.tprint( `PURCHASE attempt: ${results ? "succeeded" : "failed"}`)
-    printPurchasedServers()
+    ns.print( `PURCHASE attempt: ${results ? "succeeded" : "failed"}`)
+    printMyPurchasedServers()
   }
   
   function title(title: string) { return `---------- ${title} -----------` }
 
-  function printServerCosts() {
-    ns.tprint( title(`Server Costs`))
+  function printPurchasedServerCosts() {
+
+    ns.print( title(`Server Costs`))
+    
     for ( let size of server_sizes ) {
-      ns.tprint( `${size.toString().padEnd( 6 )} ${(ns.getPurchasedServerCost( size )/1000000).toFixed(1)}m` )
+      ns.print( `${size.toString().padEnd( 6 )} ${(ns.getPurchasedServerCost( size )/1000000).toFixed(1)}m` )
     }
+
+
   }
 
-  function printPurchasedServers() {
-    ns.tprint( title(`Purchased Servers`))
+  function printMyPurchasedServers() {
+    ns.print( title(`Purchased Servers`))
     for ( let purchased_server_name of ns.getPurchasedServers() ) {
-      ns.tprint( `${purchased_server_name.padEnd(20)} ${ns.getServerMaxRam( purchased_server_name )}`)
+      ns.print( `${purchased_server_name.padEnd(20)} ${ns.getServerMaxRam( purchased_server_name )}`)
     }
   }
 

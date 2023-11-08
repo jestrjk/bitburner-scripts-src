@@ -12,6 +12,8 @@ interface Server_Info_Extended extends Server {
 
 /** @param {NS} ns */
 export async function main(ns : NS) {
+	ns.clearLog()
+
 	let arg_data = lib_args.processArguments( ns ) 
 	let hacking_level_limit = arg_data.options.limit 
 
@@ -19,10 +21,11 @@ export async function main(ns : NS) {
 	ns.moveTail( 1450, 0 )
 	ns.resizeTail( 1050, 800 )
 
-	let { all_servers, all_server_names } = await getAllServersAndNames(ns, 'home')
-	
 	while ( true ) {
+		let { all_servers, all_server_names } = await getAllServersAndNames(ns, 'home')
 		let mapped_servers = all_servers.map( (target_server) => map_server_data(target_server))	
+
+		ns.clearLog()
 
 		let byHackingLevelLimit = ( server: any ) => ( server.hacking_level_required < hacking_level_limit ) 
 
@@ -36,13 +39,11 @@ export async function main(ns : NS) {
 		let padding = 18
 		let small_padding= 8 
 		
-		ns.clearLog()
-
 		for( let server of sorted_servers )  {		
 			let s = server // because fuck you keyboard
 			ns.print ( 
 				`${( toMillionsFormatted( s.moneyAvailable as number ))}/${toMillionsFormatted(s.moneyMax as number)}`.padEnd( large_padding )  + 
-				`SEC:${(s.hackDifficulty??-1).toFixed(1)}/${s.minDifficulty}`.padEnd( padding ) + 
+				`SEC:${(s.hackDifficulty??-1).toFixed(0).padStart(2)}/${s.minDifficulty}`.padEnd( padding ) + 
 				`${s.hasAdminRights? "ROOT":"----"}(${s.numOpenPortsRequired??-1})`.padEnd( padding ) +
 				`WGH:${toMinutes(s.weaken_time)}/${toMinutes(s.grow_time)}/${toMinutes(s.hack_time)}(m)`.padEnd( large_padding )  +
 				`${s.hostname}`.padEnd( padding ) +

@@ -5,8 +5,11 @@ import {NS} from "./NetscriptDefinitions"
 export async function main(ns : NS) {
   try {
     let target: string  = ns.args[0] as string
-    await ns.hack( target )
-  } catch ( err ) { throw err }
+    let hack_result = await ns.hack( target )
+    
+    ns.writePort( 1, JSON.stringify( { hack_result, hostname: target } ) )
+
+  } catch(err) {throw err}
   
 }
 

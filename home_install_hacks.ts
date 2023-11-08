@@ -10,21 +10,30 @@ let lite_script_names = {
 	hack: "lite_hack.js",
 }
 
-export async function main(ns : NS) {
+export async function main(ns:NS) {
 	ns.tail()
+	ns.moveTail( 250, 0 )
+	ns.resizeTail( 450, 300)
 	
-	let filter_target_server_name = ns.args.shift()?.toString() 
-	let all_servers_and_names = await getAllServersAndNames( ns, 'home' )
-	let script_host_names = all_servers_and_names.all_script_host_names
-	let target_servers = all_servers_and_names.all_servers
-	
-  let filtered_target_servers = target_servers.filter( 
-		(server) => { return server.hostname == filter_target_server_name } )
-	if ( filtered_target_servers.length >= 1 ) target_servers = filtered_target_servers
+	let filter_target_server_names = ns.args
 
-	await prepareScriptHosts(ns,script_host_names)
+	let all_servers_and_names = await getAllServersAndNames( ns, 'home' )
+	await prepareScriptHosts(ns,all_servers_and_names.all_script_host_names)
 
 	while ( true ) {
+		//init
+		all_servers_and_names = await getAllServersAndNames( ns, 'home' )
+		let script_host_names = all_servers_and_names.all_script_host_names
+		let target_servers = all_servers_and_names.all_servers
+
+		let filtered_target_servers = target_servers.filter( 
+			(target_server) => { return filter_target_server_names.includes( target_server.hostname ) } )
+		if ( filtered_target_servers.length >= 1 ) target_servers = filtered_target_servers
+	
+		
+
+		//-init
+
 		for( let target_server of target_servers ) {
 			ns.clearLog()
 
@@ -99,7 +108,19 @@ export async function main(ns : NS) {
 	 * @param time_required       Amount of seconds it will take for the action of the script to finish
 	 */
 	function exec_script( script_host_name: string, target_server_name: string, 
-		script_name: string, threads_required: number, time_required: number = -1 )	 {
+		script_name: string, threads_required: number, time_required: number = -1 ):boolean	 {
+
+		if ( ns.scriptRunning( script_name, script_host_name )) {
+			if ( ns.ps( script_host_name ).some( (script_host_proc) => { 
+				return (
+					(script_host_proc.filename == script_name) &&
+					(script_host_proc.args.includes( target_server_name ))
+				)})
+			) {
+				ns.print( `${script_host_name}:{script_name} found for ${target_server_name} aborting more hack procs`)
+				return false
+			}
+		}
 
 		ns.print( `exec_script (${script_name} t:${target_server_name} h:${script_host_name} `)
 		let host_max_ram   			= ns.getServerMaxRam( script_host_name )
@@ -121,7 +142,7 @@ export async function main(ns : NS) {
 		let ram_per_thread = ns.getScriptRam(script_name, script_host_name) 
 
 		while ( !hostHasEnoughRam( ram_per_thread, host_max_ram, used_ram, threads)) {
-			if ( threads < 1 ) return -1
+			if ( threads < 3 ) return -1
 			threads /= 2
 		}
 
