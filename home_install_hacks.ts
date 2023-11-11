@@ -1,8 +1,8 @@
 /* eslint-disable */
 import {NS, Server} from "./NetscriptDefinitions"
 import {RootKit} from "./lib_RooKit"
-import {colors} from "./lib_utils"
-import { getAllServersAndNames } from "./lib_ServerList"
+import {colors, disableNSFunctionLogging} from "./lib_utils"
+import { getAllServers , getScriptHosts} from "./lib_ServerList"
 
 let lite_script_names = {
 	weaken: "lite_weaken.js",
@@ -15,32 +15,36 @@ export async function main(ns:NS) {
 	ns.moveTail( 250, 0 )
 	ns.resizeTail( 450, 300)
 	
+	disableNSFunctionLogging(ns)
+
 	let filter_target_server_names = ns.args
 
-	let all_servers_and_names = await getAllServersAndNames( ns, 'home' )
-	await prepareScriptHosts(ns,all_servers_and_names.all_script_host_names)
-
 	while ( true ) {
-		//init
-		all_servers_and_names = await getAllServersAndNames( ns, 'home' )
-		let script_host_names = all_servers_and_names.all_script_host_names
-		let target_servers = all_servers_and_names.all_servers
+		let all_servers: Server[] = getAllServers(ns)
+		let all_server_names 			= all_servers.map( s=>s.hostname )
 
-		let filtered_target_servers = target_servers.filter( 
-			(target_server) => { return filter_target_server_names.includes( target_server.hostname ) } )
-		if ( filtered_target_servers.length >= 1 ) target_servers = filtered_target_servers
+		let rooted_servers    	= all_servers.filter(s=>s.hasAdminRights)
+		let rooted_server_names = rooted_servers.map(s=>s.hostname)
+
+		let script_hosts 		  	= getScriptHosts(ns,all_servers) 
+		let script_host_names 	= script_hosts.map(s=>s.hostname)
+
+		ns.print( `Rooting Servers` )
+		for ( let target_server of all_servers ) {
+			root_server(ns, target_server )			
+		}
 	
-		
+		prepareScriptHosts(ns,script_host_names)
+		// Start da haxoring!
 
-		//-init
-
-		for( let target_server of target_servers ) {
+		for( let target_server of all_servers ) {
 			ns.clearLog()
+			
+			if ( !target_server.hasAdminRights ) continue;
 
 			let target_server_name = target_server.hostname
 
 			ns.print ( `Starting on ${target_server.hostname}`)
-			if ( ! root_server( ns, target_server ) ) continue ;
 			
 			for ( let script_host_name of script_host_names ) {
 
@@ -50,6 +54,7 @@ export async function main(ns:NS) {
 				if ( target_max_money <= 0 ) continue ;
 	
 				let target_money 							=	ns.getServerMoneyAvailable( target_server_name )
+				
 				let target_min_security 			= ns.getServerMinSecurityLevel( target_server_name )
 				let target_current_security 	= ns.getServerSecurityLevel( target_server_name ) 
 	
@@ -61,7 +66,9 @@ export async function main(ns:NS) {
 					let weaken_threads 					= 100 ; 		// TODO TODO TODO Fix this to dynamic calc
 
 					exec_script( script_host_name, target_server_name, lite_script_names.weaken, weaken_threads, weaken_time  ) 
-				}else{ ns.print( `${colors.yellow}growth hack conditions not met`); await ns.asleep(100)}
+				} else { 
+					ns.print( `${colors.yellow}growth hack conditions not met`)
+				}
 
 				if ( target_money < .95 * target_max_money ) {
 					let grow_time 							= ns.getGrowTime( target_server_name)
@@ -69,17 +76,17 @@ export async function main(ns:NS) {
 					let growth_threads 					= Math.max( Math.floor( ns.growthAnalyze( target_server_name, growth_money_ratio, ns.getServer(script_host_name).cpuCores )), 1 );
 					
 					exec_script( script_host_name, target_server_name, lite_script_names.grow, growth_threads, grow_time ) 
-				} else{ ns.print( `${colors.yellow}growth hack conditions not met`); await ns.asleep(100)}
+				} else{ ns.print( `${colors.yellow}growth hack conditions not met`)}
 				
 				if ( target_money >= .95 * target_max_money ) {
 					let hack_time 			= ns.getHackTime( target_server_name )
 					let hack_threads   = Math.max( Math.floor( ns.hackAnalyzeThreads(target_server_name, Math.floor( target_max_money*.50 ))) , 1)
 					
 					exec_script( script_host_name, target_server_name, lite_script_names.hack, hack_threads, hack_time ) 
-				} else{ ns.print( `${colors.yellow}money hack conditions not met`); await ns.asleep(100)}
+				} else{ ns.print( `${colors.yellow}money hack conditions not met`)}
 			}
 
-			await ns.sleep( 1000 ) 
+			await ns.sleep( 100 ) 
 		} // for target_servers 
 
 		await ns.sleep ( 100 )
@@ -88,11 +95,10 @@ export async function main(ns:NS) {
 
 	// ------- Function Definitions -------
 
-	async function prepareScriptHosts(ns: NS, script_host_names: string[]) {
-
+	function prepareScriptHosts(ns: NS, script_host_names: string[]) {
 		for (let script_host_name of script_host_names) {
 			if (ns.serverExists(script_host_name)) {
-				killRunningLiteScripts(ns, script_host_name)
+				// killRunningLiteScripts(ns, script_host_name)
 				installHackingScripts(ns, script_host_name)
 			}
 		}
@@ -117,16 +123,13 @@ export async function main(ns:NS) {
 					(script_host_proc.args.includes( target_server_name ))
 				)})
 			) {
-				ns.print( `${script_host_name}:{script_name} found for ${target_server_name} aborting more hack procs`)
 				return false
 			}
 		}
 
-		ns.print( `exec_script (${script_name} t:${target_server_name} h:${script_host_name} `)
 		let host_max_ram   			= ns.getServerMaxRam( script_host_name )
 
 		let adjusted_thread_count = adjustThreadCount( ns, script_host_name, host_max_ram, script_name, threads_required )
-		ns.print ( `Adjusted thread count: h:${script_host_name} t:${target_server_name} ${threads_required} -> ${adjusted_thread_count}`)
 		if ( adjusted_thread_count < 1 ) {
 			ns.print( `${colors.brightRed}Not enough memory ${host_max_ram}`)
 			return false
@@ -159,8 +162,6 @@ export async function main(ns:NS) {
 		let lite_script_names_values = Object.values( lite_script_names )
 			ns.scp( lite_script_names_values, script_host_name, 'home' )
 	}
-
-	
 
 	function isLiteScriptRunning(script_host_name: string) {
 			let proc_list = ns.ps(script_host_name)

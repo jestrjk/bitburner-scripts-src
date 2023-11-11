@@ -67,3 +67,21 @@ export async function testPort( ns:NS, data: any ) {
   
   ns.print( `Wrote 'asdfghjk' ${count} times. ~${count*8}B`)
 }
+
+export function disableNSFunctionLogging(ns:NS) {
+  ns.disableLog( "sleep" )  
+  ns.disableLog( "asleep" )  
+	ns.disableLog( `exec` )
+	ns.disableLog( `getServer` )
+	ns.disableLog( `getServerUsedRam` )
+	ns.disableLog( `getServerMaxRam` )
+	ns.disableLog( `getServerMoneyAvailable` )
+	ns.disableLog( `getServerMaxMoney` )
+	ns.disableLog( `getServerMinSecurityLevel` )
+	ns.disableLog( `getServerSecurityLevel` )
+	ns.disableLog( `getWeakenTime` )
+	ns.disableLog( `weakenAnalyze` )
+	ns.disableLog( `getGrowTime` )
+	ns.disableLog( `growthAnalyze` )
+
+}

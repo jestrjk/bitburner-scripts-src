@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { NS, Server } from './NetscriptDefinitions'
 import * as lib_args from './lib_argumentProcessor'
-import {getAllServersAndNames} from './lib_ServerList'
+import { getAllServers, getScriptHosts} from './lib_ServerList'
 import { toMillionsFormatted } from './lib_utils'
 
 interface Server_Info_Extended extends Server {
@@ -22,7 +22,7 @@ export async function main(ns : NS) {
 	ns.resizeTail( 1050, 800 )
 
 	while ( true ) {
-		let { all_servers, all_server_names } = await getAllServersAndNames(ns, 'home')
+		let all_servers : Server[] = getAllServers(ns)
 		let mapped_servers = all_servers.map( (target_server) => map_server_data(target_server))	
 
 		ns.clearLog()
