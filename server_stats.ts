@@ -13,6 +13,7 @@ interface Server_Info_Extended extends Server {
 /** @param {NS} ns */
 export async function main(ns : NS) {
 	ns.clearLog()
+	ns.disableLog("sleep")
 
 	let arg_data = lib_args.processArguments( ns ) 
 	let hacking_level_limit = arg_data.options.limit 
@@ -20,7 +21,9 @@ export async function main(ns : NS) {
 	ns.tail( ns.pid )
 	ns.moveTail( 1450, 0 )
 	ns.resizeTail( 1050, 800 )
-
+	
+	let alternate = true
+	
 	while ( true ) {
 		let all_servers : Server[] = getAllServers(ns)
 		let mapped_servers = all_servers.map( (target_server) => map_server_data(target_server))	
@@ -32,23 +35,50 @@ export async function main(ns : NS) {
 		if ( hacking_level_limit ) { 
 			mapped_servers =  mapped_servers.filter( byHackingLevelLimit ) 
 		}
-
-		let sorted_servers = mapped_servers.sort( (a,b) => ( a.weaken_time - b.weaken_time) )
-
-		let large_padding = 24
-		let padding = 18
-		let small_padding= 8 
 		
+		function sortByReqHackSkill_Ascending(a:any,b:any) { return ( a.requiredHackingSkill! - b.requiredHackingSkill!) }
+		function sortByReqHackSkill_Descending(a:any,b:any) { return ( b.requiredHackingSkill! - a.requiredHackingSkill!) }
+		let sortByReqHackSkill_AlternatingDirection = sortByReqHackSkill_Ascending
+		
+		alternate = !alternate
+		if (alternate) 
+					{ sortByReqHackSkill_AlternatingDirection = sortByReqHackSkill_Ascending } 
+		else 	{ sortByReqHackSkill_AlternatingDirection = sortByReqHackSkill_Descending }
+
+		let sorted_servers = mapped_servers.sort( sortByReqHackSkill_Ascending )
+
+		let printHeaders = () => ns.print( 
+			`hostname`								.padEnd( 24 ) +
+			`reqhack`									.padEnd(8) +
+			`$avail`									.padEnd(12) +
+			`$max`										.padEnd(12) + 
+			`difficulty`							.padEnd(12) +  
+			`adminrights`							.padEnd(12) +
+			`weaken/grow/hack times`	.padEnd(15) 
+		)
+
+
+		printHeaders()
 		for( let server of sorted_servers )  {		
 			let s = server // because fuck you keyboard
+			
+			let hasAdminRights = s.hasAdminRights? "ROOT":"----"
+
 			ns.print ( 
-				`${( toMillionsFormatted( s.moneyAvailable as number ))}/${toMillionsFormatted(s.moneyMax as number)}`.padEnd( large_padding )  + 
-				`SEC:${(s.hackDifficulty??-1).toFixed(0).padStart(2)}/${s.minDifficulty}`.padEnd( padding ) + 
-				`${s.hasAdminRights? "ROOT":"----"}(${s.numOpenPortsRequired??-1})`.padEnd( padding ) +
-				`WGH:${toMinutes(s.weaken_time)}/${toMinutes(s.grow_time)}/${toMinutes(s.hack_time)}(m)`.padEnd( large_padding )  +
-				`${s.hostname}`.padEnd( padding ) +
-				`${s.requiredHackingSkill}`.padEnd( small_padding ) )
+				`${s.hostname}`																					.padEnd( 24 ) +
+				`${s.requiredHackingSkill}`															.padEnd(8) +
+				`${toMillionsFormatted( s.moneyAvailable as number )}`	.padEnd(12) +
+				`${toMillionsFormatted( s.moneyMax as number)}`					.padEnd(12) + 
+				`${(s.hackDifficulty??-1).toFixed(0)}` 									.padEnd(6) +  
+				`${s.minDifficulty}`																		.padEnd(6) + 
+				`${hasAdminRights}(${s.numOpenPortsRequired??-1})`			.padEnd(12) +
+				`${toMinutes(s.weaken_time)}`														.padEnd(5) +
+				`${toMinutes(s.grow_time)}`															.padEnd(5) +
+				`${toMinutes(s.hack_time)}(m)`													.padEnd(5)
+			)
 		}
+		printHeaders()
+
 		await ns.sleep( 1000 )
 	}	// while(true)
 

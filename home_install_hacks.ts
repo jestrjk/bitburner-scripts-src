@@ -86,10 +86,9 @@ export async function main(ns:NS) {
 				} else{ ns.print( `${colors.yellow}money hack conditions not met`)}
 			}
 
-			await ns.sleep( 100 ) 
 		} // for target_servers 
 
-		await ns.sleep ( 100 )
+		await ns.sleep ( 10 )
 	} // while true
 
 
