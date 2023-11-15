@@ -3,8 +3,10 @@ import * as PM  from "./lib_PortManager"
 
 export async function main(ns:NS) {
   ns.tail() 
+  ns.moveTail(1885, 1020)
+  ns.resizeTail(660,100)
+
   ns.clearLog()
-  //ns.disableLog( "sleep" )
 
   PM.clearPortManagers(ns)  
 

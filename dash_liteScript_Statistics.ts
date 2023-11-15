@@ -3,7 +3,9 @@ import * as PM from "./lib_PortManager"
 
 export async function main (ns:NS) {
   ns.tail()
-  ns.print( `Tail`)
+  ns.resizeTail( 700, 300)
+  ns.moveTail( 1175, 820)
+
   let pm = PM.getPortManager(ns,PM.PortNumbers.liteScriptResults) 
   //ns.print( `PM.getPortManager()`)
   while (true) {

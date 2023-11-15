@@ -2,6 +2,9 @@ import {NS} from "./NetscriptDefinitions"
 
 export async function main(ns:NS) {
   ns.tail()
+  ns.moveTail(2550, 1055)
+  ns.resizeTail(200, 60)
+
   ns.disableLog( "asleep")
   ns.disableLog( "sleep")
   
