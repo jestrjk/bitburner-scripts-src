@@ -32,11 +32,6 @@ export const hackTypes = {
 }
 
 const NULL_PORT_DATA:string = "NULL PORT DATA"
-// const locks = { 
-//   tryWriteQueueLock: false,
-//   tryReadQueueLock: false,
-//   peekLock: false,
-// }
 const portManagers:PortManager[] = []
 class PortManager {
   constructor (ns:NS,port_numbers:PortNumbers) {
@@ -85,11 +80,6 @@ class PortManager {
   }
 
   readJSONPort(): LiteScriptJSONParams {
-    // while ( locks.tryReadQueueLock ) {
-    //   await this.ns.sleep(10)
-    // }
-    // locks.tryReadQueueLock = true
-
     this.monitoringStats.reads++
 
     let port_data = this.ns.readPort( this.portNumbers )
@@ -99,22 +89,16 @@ class PortManager {
       hacktype: "",
       hostname: "",
     }
-    // locks.tryReadQueueLock = false
 
     return JSON.parse( port_data.toString() )
   }
 
   writeJSONPort(data:LiteScriptJSONParams):boolean {
-    // while ( locks.tryWriteQueueLock ) {
-    //   await this.ns.asleep(10)
-    // }
-    // locks.tryWriteQueueLock = true
-
     this.monitoringStats.writes++
 
     let _data = JSON.stringify( data )
     let result = this.ns.tryWritePort(this.portNumbers, _data)
-    // locks.tryWriteQueueLock = false
+
     return result
   }
 
