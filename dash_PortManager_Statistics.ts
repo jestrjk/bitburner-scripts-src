@@ -7,11 +7,10 @@ export async function main(ns:NS) {
   //ns.disableLog( "sleep" )
 
   PM.clearPortManagers(ns)  
-  ns.tprint( `Port Managers: ${JSON.stringify( PM.getPortManagers(), null, 1)}`)
 
   while(true) {
     ns.clearLog()
-    let pm = PM.portManager(ns, PM.PortNumbers.liteScriptResults)
+    let pm = PM.getPortManager(ns, PM.PortNumbers.liteScriptResults)
     let stats = pm.getMonitoringStats()
     let port_numbers = pm.portNumbers
     ns.print( header() )

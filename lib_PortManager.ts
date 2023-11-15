@@ -80,17 +80,22 @@ class PortManager {
   }
 
   readJSONPort(): LiteScriptJSONParams {
-    this.monitoringStats.reads++
+    try {
+      this.ns.print( `[readJSONPort] Trying readJSONPort()`)
+      this.monitoringStats.reads++
 
-    let port_data = this.ns.readPort( this.portNumbers )
-    if ( port_data === NULL_PORT_DATA ) return {
-      empty: true,
-      result: Infinity,
-      hacktype: "",
-      hostname: "",
-    }
-
-    return JSON.parse( port_data.toString() )
+      this.ns.print( `[readJSONPort] reading port`)
+      let port_data = this.ns.readPort( this.portNumbers )
+      this.ns.print( `[readJSONPort] processing return`)
+      if ( port_data === NULL_PORT_DATA ) return {
+        empty: true,
+        result: Infinity,
+        hacktype: "",
+        hostname: "",
+      }
+      this.ns.print( `[readJSONPort] JSON Parsing`)
+      return JSON.parse( port_data.toString() )
+    } catch (err) { throw `[lib_PortManager] ${JSON.stringify( err, null, 1)}` }
   }
 
   writeJSONPort(data:LiteScriptJSONParams):boolean {
@@ -109,9 +114,9 @@ class PortManager {
 
 }
 
-export function getPortManagers() { return portManagers.slice(0) }
+function getPortManagers() { return portManagers.slice(0) }
 
-export function portManager(ns:NS, portNumber:PortNumbers):PortManager {
+export function getPortManager(ns:NS, portNumber:PortNumbers):PortManager {
   if ( portManagers[portNumber] ) return portManagers[portNumber]
   let new_manager = new PortManager( ns, portNumber )
   portManagers[portNumber] = new_manager
