@@ -4,22 +4,33 @@ import { NS } from "./NetscriptDefinitions"
 import { testPort } from "./lib_utils"
 
 export async function main( ns: NS ) {
-  ns.tail()
-  ns.clearLog()
-  ns.clearPort( 1 )
-
-  await testPort(ns, {your: "shit", strinks: true})
-
-  let blah = {
-    method1: () => {console.log(1)},
-    method2: () => {console.log(2)},
-    prop1: 100,
-  }
+  ns.tail() 
   
-  blah.method1()
-  blah["prop1"]
+  while ( true ) {
+    ns.tail() 
+
+    while (true ) {
+      let initial = Date.now()
+      await ns.sleep(1000) 
+      let now = Date.now()
+  
+      let di = new Date ( initial )
+      let dn = new Date ( now )
+
+      let diff = dn.)
+      let dd = new Date ( diff )
+  
+  
+      ns.print ( `init: ${sepDate(di)} now: ${sepDate(dn)} diff: ${sepDate(dd)}` )
+    }
 
 
+    
+    function sepDate( d:Date ) { 
+      return [ d.getHours(), d.getMinutes() , d.getSeconds()]
+    }
+    
+  }
 
 }
 

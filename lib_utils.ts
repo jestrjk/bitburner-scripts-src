@@ -68,6 +68,9 @@ export async function testPort( ns:NS, data: any ) {
   ns.print( `Wrote 'asdfghjk' ${count} times. ~${count*8}B`)
 }
 
+export function printUsage(schema:any[]) {
+
+}
 export function disableNSFunctionLogging(ns:NS) {
   ns.disableLog( "sleep" )  
   ns.disableLog( "asleep" )  

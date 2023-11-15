@@ -1,7 +1,7 @@
 /* eslint-disable */
 /** @typedef{import("./NetscriptDefinitions").NS} NS */
 
-import {PortManager} from "./suck_lib"
+import {PortManager} from "/suck_lib.js"
 
 /** @param {NS} ns  */
 export async function main(ns) {

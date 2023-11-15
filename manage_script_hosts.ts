@@ -4,10 +4,11 @@ import { colors, disableNSFunctionLogging } from "./lib_utils"
 
 export async function main ( ns: NS ) {
   ns.tail()
+  ns.moveTail(1800, 400)
   ns.clearLog()
   disableNSFunctionLogging(ns)
 
-  let base_ram = 64
+  let base_ram = 1
   let server_sizes: number[] = []
 
   for ( let i = 0 ; i < 10; i++ ) {
@@ -26,17 +27,21 @@ export async function main ( ns: NS ) {
 
   // PROMPT LOOP
   while (true) {
+    let options = ns.flags([["auto", false],["size", 64]])
+    ns.print( options )
+
     let choice = await ns.prompt( "Choose your Action:", { type: "select", choices: Object.values(Commands)})
     ns.print( `Choice Selected: ${choice}`)
    
     switch ( choice ) {
       case Commands.buy_costs:
-        printPurchasedServerCosts();      break ;
+        printPurchasedServerCosts() ;      
+        break ;
       case Commands.rename:
         ns.renamePurchasedServer(await askPurchasedServerName("RENAME"), await askServerName("RENAME") ); 
-        break;
+        break ;
       case Commands.buy:
-        await buy();
+        await buy() ;
         break ;
       case Commands.upgrade:
         await upgrade() ;
@@ -47,13 +52,13 @@ export async function main ( ns: NS ) {
         break ;
       case Commands.buy_costs: 
         printPurchasedServerCosts() ;
-      break ;
+        break ;
       case Commands.list_purchased:
-        printMyPurchasedServers()
-        break;
+        printMyPurchasedServers() ;
+        break ;
 
       case Commands.exit:
-        ns.exit();
+        ns.exit() ;
       default: 
         ns.print( `ERROR: not a valid command: ${choice}`)
         ns.print( Commands )
@@ -101,7 +106,9 @@ export async function main ( ns: NS ) {
   }
   
   async function buy() {
-            
+    printPurchasedServerCosts()
+    printMyPurchasedServers()
+    
     let host_name_new_server = ns.purchaseServer(await askServerName("BUY"), await askRam("BUY"))
 
     if (host_name_new_server)   ns.print( `PURCHASE attempt: ${host_name_new_server ? "succeeded" : "failed"}`)

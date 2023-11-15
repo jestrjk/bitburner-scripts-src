@@ -38,17 +38,15 @@ export async function main(ns:NS) {
 		// Start da haxoring!
 
 		for( let target_server of all_servers ) {
-			ns.clearLog()
+			//ns.clearLog()
 			
 			if ( !target_server.hasAdminRights ) continue;
 
 			let target_server_name = target_server.hostname
 
-			ns.print ( `Starting on ${target_server.hostname}`)
-			
 			for ( let script_host_name of script_host_names ) {
 
-				if ( ! ns.serverExists( script_host_name ) ) { ns.print( `${script_host_name} does not exist`); continue; }
+				if ( ! ns.serverExists( script_host_name ) ) { ns.print( `[${target_server.hostname}] ${script_host_name} does not exist`); continue; }
 
 				let target_max_money 			=	ns.getServerMaxMoney( target_server_name )
 				if ( target_max_money <= 0 ) continue ;
@@ -58,7 +56,7 @@ export async function main(ns:NS) {
 				let target_min_security 			= ns.getServerMinSecurityLevel( target_server_name )
 				let target_current_security 	= ns.getServerSecurityLevel( target_server_name ) 
 	
-				ns.print( `${colors.brightCyan}Entering script conditions` )
+				ns.print( `[${target_server_name}] ${colors.brightCyan}Entering script conditions` )
 				// Script conditions
 				if ( target_current_security >= 10 + target_min_security ) {
 					let weaken_time 						= ns.getWeakenTime( target_server_name )
@@ -67,7 +65,7 @@ export async function main(ns:NS) {
 
 					exec_script( script_host_name, target_server_name, lite_script_names.weaken, weaken_threads, weaken_time  ) 
 				} else { 
-					ns.print( `${colors.yellow}growth hack conditions not met`)
+					ns.print( `[${target_server.hostname}] ${colors.yellow}growth hack conditions not met`)
 				}
 
 				if ( target_money < .95 * target_max_money ) {
@@ -76,19 +74,19 @@ export async function main(ns:NS) {
 					let growth_threads 					= Math.max( Math.floor( ns.growthAnalyze( target_server_name, growth_money_ratio, ns.getServer(script_host_name).cpuCores )), 1 );
 					
 					exec_script( script_host_name, target_server_name, lite_script_names.grow, growth_threads, grow_time ) 
-				} else{ ns.print( `${colors.yellow}growth hack conditions not met`)}
+				} else{ ns.print( `[${target_server.hostname}] ${colors.yellow}growth hack conditions not met`)}
 				
 				if ( target_money >= .95 * target_max_money ) {
 					let hack_time 			= ns.getHackTime( target_server_name )
 					let hack_threads   = Math.max( Math.floor( ns.hackAnalyzeThreads(target_server_name, Math.floor( target_max_money*.50 ))) , 1)
 					
 					exec_script( script_host_name, target_server_name, lite_script_names.hack, hack_threads, hack_time ) 
-				} else{ ns.print( `${colors.yellow}money hack conditions not met`)}
+				} else{ ns.print( `[${target_server.hostname}] ${colors.yellow}money hack conditions not met`)}
 			}
 
 		} // for target_servers 
 
-		await ns.sleep ( 10 )
+		await ns.asleep ( 10 )
 	} // while true
 
 
@@ -130,7 +128,7 @@ export async function main(ns:NS) {
 
 		let adjusted_thread_count = adjustThreadCount( ns, script_host_name, host_max_ram, script_name, threads_required )
 		if ( adjusted_thread_count < 1 ) {
-			ns.print( `${colors.brightRed}Not enough memory ${host_max_ram}`)
+			ns.print( `[${target_server_name}] ${colors.brightRed}[${host_max_ram}] Not enough memory`)
 			return false
 		}
 
@@ -159,6 +157,7 @@ export async function main(ns:NS) {
 	
 	function installHackingScripts( ns: NS,script_host_name: string ) {
 		let lite_script_names_values = Object.values( lite_script_names )
+		lite_script_names_values.push( "lib_PortManager.js")
 			ns.scp( lite_script_names_values, script_host_name, 'home' )
 	}
 
@@ -175,7 +174,7 @@ export async function main(ns:NS) {
 		if ( target_server.hasAdminRights ) { return true } else {
 			let root_kit = new RootKit(ns, target_server ) 
 			let rooted = root_kit.run()
-			ns.print( `rooted: ${rooted}` )
+			ns.print( `[${target_server.hostname}] rooted: ${rooted}` )
 			target_server = ns.getServer(target_server.hostname)
 			
 			if ( target_server.hasAdminRights ) { return true } else {
