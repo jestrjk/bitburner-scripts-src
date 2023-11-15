@@ -81,19 +81,19 @@ class PortManager {
 
   readJSONPort(): LiteScriptJSONParams {
     try {
-      this.ns.print( `[readJSONPort] Trying readJSONPort()`)
+      //this.ns.print( `[readJSONPort] Trying readJSONPort()`)
       this.monitoringStats.reads++
 
-      this.ns.print( `[readJSONPort] reading port`)
+      //this.ns.print( `[readJSONPort] reading port`)
       let port_data = this.ns.readPort( this.portNumbers )
-      this.ns.print( `[readJSONPort] processing return`)
+      //this.ns.print( `[readJSONPort] processing return`)
       if ( port_data === NULL_PORT_DATA ) return {
         empty: true,
         result: Infinity,
         hacktype: "",
         hostname: "",
       }
-      this.ns.print( `[readJSONPort] JSON Parsing`)
+      //this.ns.print( `[readJSONPort] JSON Parsing`)
       return JSON.parse( port_data.toString() )
     } catch (err) { throw `[lib_PortManager] ${JSON.stringify( err, null, 1)}` }
   }
@@ -124,7 +124,7 @@ export function getPortManager(ns:NS, portNumber:PortNumbers):PortManager {
 } 
 
 export function clearPortManagers(ns:NS) {
-  ns.tprint( `Clearing PortManagers`)
+  ns.print( `Clearing PortManagers`)
   let pm:PortManager | undefined
-  while ( ( pm = portManagers.shift()) ) { ns.tprint( `Clearing: ${pm.portNumbers}`)}
+  while ( ( pm = portManagers.shift()) ) { ns.print( `Clearing: ${pm.portNumbers}`)}
 }
