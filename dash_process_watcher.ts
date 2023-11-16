@@ -43,7 +43,7 @@ export async function main ( ns: NS ) {
     proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
     printExtendedProcessData(proc_data, script_host_ram, script_host_max_ram )
     
-    await ns.sleep( 5000 )
+    await ns.sleep( 1000 )
   }
 
   function printExtendedProcessData(proc_data: CustomProcessInfo[], script_host_ram:number, script_host_max_ram:number ) {

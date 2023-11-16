@@ -3,9 +3,19 @@ import * as PM  from "./lib_PortManager"
 
 export async function main(ns:NS) {
   ns.tail() 
-  ns.moveTail(1885, 1020)
-  ns.resizeTail(660,100)
+  let [ window_width, window_height] = ns.ui.windowSize()
+  let desired_tail_width = 660
+  let desired_tail_height = 100
 
+  let desired_tail_pos_width = window_width - desired_tail_width-200 -5
+  let desired_tail_pos_height = window_height - desired_tail_height -5
+
+  ns.tprint( `window size: ${window_width},${window_height}`)
+  ns.tprint( `tail pos: ${desired_tail_pos_width},${desired_tail_pos_height}`)
+
+  ns.moveTail(desired_tail_pos_width, desired_tail_pos_height)
+  ns.resizeTail(desired_tail_width,desired_tail_height)
+  
   ns.clearLog()
 
   PM.clearPortManagers(ns)  
