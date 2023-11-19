@@ -2,12 +2,10 @@ import {NS, Server} from "../NetscriptDefinitions"
 
 export class ServerPath {
   constructor(ns:NS,start_node_name:string, target_node_name: string) {
-    ns.print(`ctor`)
     this._ns = ns
     this._start_node_name = start_node_name
     this._target_node_name = target_node_name
 
-    ns.print( `Finding Path`)
     if(this.findPath( start_node_name )) {
       ns.print(`Found Path`)
     }else {
@@ -29,6 +27,11 @@ export class ServerPath {
     return this._already_visited_names
   }
 
+  goToTarget(target_server_name:string = this._target_node_name) {
+    for( let next_server_name_in_path of this._path ){
+      this._ns.singularity.connect( next_server_name_in_path ) 
+    }
+  }
   private findPath(current_node_name:string):boolean {
     if ( this._already_visited_names.includes( current_node_name )){
       //this._already_visited_names.push(`DEAD END`)

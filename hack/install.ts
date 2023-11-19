@@ -35,6 +35,7 @@ export async function main(ns:NS) {
 		ns.print( `target_servers: ${JSON.stringify( target_servers.map(s=>s.hostname))}`)
 
 		let script_hosts 		  	= getScriptHosts(ns,all_servers) 
+		ns.print( JSON.stringify( script_hosts, null, 1))
 		let script_host_names 	= script_hosts.map(s=>s.hostname)
 
 		for ( let target_server of target_servers ) {
@@ -164,7 +165,7 @@ export async function main(ns:NS) {
 	
 	function installHackingScripts( ns: NS,script_host_name: string ) {
 		let lite_script_names_values = Object.values( lite_script_names )
-		lite_script_names_values.push( "lib_PortManager.js")
+		lite_script_names_values.push( "lib/PortManager.js")
 			ns.scp( lite_script_names_values, script_host_name, 'home' )
 	}
 

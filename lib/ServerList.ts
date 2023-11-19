@@ -35,7 +35,7 @@ export function getScriptHosts(ns:NS, all_servers: Server[]) {
   // but deconstructing it first into Server,Server,Server with the
   // ... operator. push accepts deconstructed individual pushed objects, but
   // not just an array of the desired content. /shrug
-  script_hosts.push(...all_servers.filter(s=>s.purchasedByPlayer && !s.hostname.startsWith( "utility-scripts")))
+  script_hosts = all_servers.filter((s=>s.purchasedByPlayer && !s.hostname.startsWith( "utility-scripts")))
 
   return script_hosts
 }
