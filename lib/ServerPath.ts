@@ -30,7 +30,10 @@ export class ServerPath {
   }
 
   private findPath(current_node_name:string):boolean {
-    if ( this._already_visited_names.includes( current_node_name )) return false;
+    if ( this._already_visited_names.includes( current_node_name )){
+      //this._already_visited_names.push(`DEAD END`)
+      return false;
+    } 
 
     this._already_visited_names.push ( current_node_name )
     this._path.push( current_node_name )
@@ -46,6 +49,7 @@ export class ServerPath {
       if (found_path) return found_path
     } 
     this._path.pop() 
+    this._already_visited_names.push(`DEAD END`)
     return false     
   }
 }
