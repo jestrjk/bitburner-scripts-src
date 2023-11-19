@@ -1,12 +1,12 @@
 /* eslint-disable */
+import {NS} from "../NetscriptDefinitions"
 
 interface Arguments {
 	options: { [key: string]: string }
 	args: (number | string)[]
 }
 
-/** @param {NS} ns */
-export function processArguments( ns ) {
+export function processArguments( ns:NS ) {
 	let args = ns.args ;
 
 	let processed_args: Arguments = {
@@ -19,7 +19,7 @@ export function processArguments( ns ) {
 		let arg = ns.args[i] 
 
 		if ( Number.isInteger( arg ) ) {
-			processed_args.args.push( arg )
+			//processed_args.args.push( arg )
 			continue
 		}		
 
@@ -28,10 +28,10 @@ export function processArguments( ns ) {
 			let new_option_value = ns.args[i+1]
 			i++
 
-			processed_args.options[new_option_key] = new_option_value
+			//processed_args.options[new_option_key] = new_option_value
 			continue
 		} else {
-			processed_args.args.push( arg ) 
+			//processed_args.args.push( arg ) 
 		}
 	}
 

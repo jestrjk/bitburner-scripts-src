@@ -1,6 +1,6 @@
 /* eslint-disable */
-import {NS} from "./NetscriptDefinitions"
-import * as PortManager from "./lib_PortManager";
+import {NS} from "../NetscriptDefinitions"
+import * as PortManager from "./PortManager";
 
 export async function main(ns:NS) {
   ns.tail()

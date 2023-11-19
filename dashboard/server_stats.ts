@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { NS, Server } from './NetscriptDefinitions'
-import * as lib_args from './lib_argumentProcessor'
-import { getAllServers, getScriptHosts} from './lib_ServerList'
-import { toMillionsFormatted } from './lib_utils'
+import { NS, Server } from '../NetscriptDefinitions'
+import * as lib_args from '../lib/argumentProcessor'
+import { getAllServers, getScriptHosts} from '../lib/ServerList'
+import { toMillionsFormatted } from '../lib/utils'
 
 interface Server_Info_Extended extends Server {
 	weaken_time: number

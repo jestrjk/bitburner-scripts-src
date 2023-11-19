@@ -1,7 +1,7 @@
 /* eslint-disable */
-import {NS, ProcessInfo, Server} from "./NetscriptDefinitions"
-import {getAllServers, getScriptHosts} from "./lib_ServerList"
-import { disableNSFunctionLogging } from "./lib_utils"
+import {NS, ProcessInfo, Server} from "../NetscriptDefinitions"
+import {getAllServers, getScriptHosts} from "../lib/ServerList"
+import { disableNSFunctionLogging } from "../lib/utils"
 
 interface CustomProcessInfo extends ProcessInfo {
   target_server_name:     string
@@ -76,7 +76,7 @@ export async function main ( ns: NS ) {
     
     for( let script_host_name of script_host_names ) {
       for (let proc of ns.ps(script_host_name) ) {
-        if ( ! proc.filename.startsWith( `lite_`) ) continue
+        if ( ! proc.filename.startsWith( "hack/") ) continue
       
         let target_server_name  = proc.args[0] as string
         let started_at          = proc.args[1] as number

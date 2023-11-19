@@ -1,6 +1,6 @@
 /* eslint-disable */
-import {NS, PortData} from "./NetscriptDefinitions" 
-import { colors, disableNSFunctionLogging } from "./lib_utils"
+import {NS, PortData} from "../NetscriptDefinitions" 
+import { colors, disableNSFunctionLogging } from "../lib/utils"
 
 export async function main ( ns: NS ) {
   ns.tail()

@@ -1,4 +1,6 @@
-import {CrimeType, NS} from "./NetscriptDefinitions"
+import {NS} from "../NetscriptDefinitions"
+import {getUtilityHosts,getAllServers} from "../lib/ServerList"
+
 interface NetworkNode {
   node_name: string
   child_nodes: NetworkNode[]
@@ -8,7 +10,20 @@ export async function main(ns:NS) {
   ns.tail()
   //ns.disableLog( "sleep")
   //ns.disableLog( "scan")
-   
+  
+  let utility_hosts = getUtilityHosts(ns,getAllServers(ns))
+
+  
+  for (let utility_host of utility_hosts) {
+    let available_memory = utility_host.maxRam - utility_host.ramUsed
+    let script_ram_required = ns.getScriptRam( ns.getScriptName(), utility_host.hostname )
+    if ( available_memory < script_ram_required ) {
+      ns.print(`WARNING not enough ram for ${ns.getScriptName()}(${ns.formatRam( script_ram_required )}) on ${utility_host.hostname}`)
+    }
+    ns.scp("hack/hackManuals.js", utility_host.hostname)
+  }
+  
+
   while ( true ) {
     await ns.singularity.manualHack()
         

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { NS, Server } from './NetscriptDefinitions'
+import { NS, Server } from '../NetscriptDefinitions'
 
 export function getAllServers(ns:NS) : Server[] {
   let all_servers : Server[] = []
@@ -20,6 +20,14 @@ function recursiveServerScan(ns: NS, parent_host_name = 'home', all_servers: Ser
   }
 }
 
+export function getUtilityHosts( ns:NS, all_servers: Server[] ) {
+  let utility_hosts:Server[] = []
+
+  utility_hosts = all_servers.filter(s=>s.purchasedByPlayer && s.hostname.startsWith("utility-scripts"))
+
+  return utility_hosts;
+}
+
 export function getScriptHosts(ns:NS, all_servers: Server[]) {
   let script_hosts:Server[] = []
 
@@ -27,7 +35,7 @@ export function getScriptHosts(ns:NS, all_servers: Server[]) {
   // but deconstructing it first into Server,Server,Server with the
   // ... operator. push accepts deconstructed individual pushed objects, but
   // not just an array of the desired content. /shrug
-  script_hosts.push(...all_servers.filter(s=>s.purchasedByPlayer))
+  script_hosts.push(...all_servers.filter(s=>s.purchasedByPlayer && !s.hostname.startsWith( "utility-scripts")))
 
   return script_hosts
 }

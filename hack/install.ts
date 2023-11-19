@@ -1,13 +1,13 @@
 /* eslint-disable */
-import {NS, Server} from "./NetscriptDefinitions"
-import {RootKit} from "./lib_RooKit"
-import {colors, disableNSFunctionLogging} from "./lib_utils"
-import { getAllServers , getScriptHosts} from "./lib_ServerList"
+import {NS, Server} from "../NetscriptDefinitions"
+import {RootKit} from "../lib/RooKit"
+import {colors, disableNSFunctionLogging} from "../lib/utils"
+import { getAllServers , getScriptHosts} from "../lib/ServerList"
 
 let lite_script_names = {
-	weaken: "lite_weaken.js",
-	grow: "lite_grow.js",
-	hack: "lite_hack.js",
+	weaken: "hack/weaken.js",
+	grow: "hack/grow.js",
+	hack: "hack/hack.js",
 }
 
 export async function main(ns:NS) {

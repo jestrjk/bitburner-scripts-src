@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {NS,MoneySource,MoneySources} from "./NetscriptDefinitions";
+import {NS,MoneySource,MoneySources} from "../NetscriptDefinitions";
 
 export async function main(ns:NS) {
   ns.tail()

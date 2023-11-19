@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { NS } from "./NetscriptDefinitions";
-import { colors } from "./lib_utils"
+import { NS } from "../NetscriptDefinitions";
+import { colors } from "../lib/utils"
 
 export async function main ( ns:NS ) {
   ns.tail() 

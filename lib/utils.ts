@@ -1,5 +1,5 @@
 /* eslint-disable */
-import {NS, PortData} from "./NetscriptDefinitions"
+import {NS, PortData} from "../NetscriptDefinitions"
 
 /**
 * converts an amount to decimal percentage, ie

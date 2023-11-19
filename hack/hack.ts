@@ -1,5 +1,5 @@
-import {NS} from "./NetscriptDefinitions"
-import * as PM from "./lib_PortManager"
+import {NS} from "../NetscriptDefinitions"
+import * as PM from "../lib/PortManager"
 
 /** @param {NS} ns */
 export async function main(ns : NS) {
