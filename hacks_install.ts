@@ -17,29 +17,36 @@ export async function main(ns:NS) {
 	
 	disableNSFunctionLogging(ns)
 
-	let filter_target_server_names = ns.args
+	let arg_target_servers = ns.args.map(arg=>ns.getServer(arg as string))
+	ns.print(`arg_target_servers: ${JSON.stringify( arg_target_servers.map(s=>s.hostname))}`)
 
+	await ns.sleep( 5000 )
 	while ( true ) {
-		let all_servers: Server[] = getAllServers(ns)
+		let target_servers: Server[] = []
+		let all_servers = getAllServers(ns)
 		let all_server_names 			= all_servers.map( s=>s.hostname )
 
-		let rooted_servers    	= all_servers.filter(s=>s.hasAdminRights)
-		let rooted_server_names = rooted_servers.map(s=>s.hostname)
+		if ( arg_target_servers.length > 0 ) {
+			target_servers = arg_target_servers
+		} else {
+			target_servers = getAllServers(ns)
+		}
+
+		ns.print( `target_servers: ${JSON.stringify( target_servers.map(s=>s.hostname))}`)
 
 		let script_hosts 		  	= getScriptHosts(ns,all_servers) 
 		let script_host_names 	= script_hosts.map(s=>s.hostname)
 
-		ns.print( `Rooting Servers` )
-		for ( let target_server of all_servers ) {
+		for ( let target_server of target_servers ) {
 			root_server(ns, target_server )			
 		}
 	
 		prepareScriptHosts(ns,script_host_names)
 		// Start da haxoring!
-
-		for( let target_server of all_servers ) {
+		
+		for( let target_server of target_servers ) {
 			//ns.clearLog()
-			
+						
 			if ( !target_server.hasAdminRights ) continue;
 
 			let target_server_name = target_server.hostname

@@ -10,10 +10,10 @@ export async function main(ns:NS) {
   //ns.disableLog( "scan")
    
   while ( true ) {
-    // await ns.singularity.manualHack()
-    let time = ns.singularity.commitCrime("Deal Drugs", false)
-
-    await ns.sleep( time+100 )
+    await ns.singularity.manualHack()
+        
+    // let time = ns.singularity.commitCrime("Homicide", false)
+    // await ns.sleep( time+100 )
   }
 
   // ns.atExit(() => ns.singularity.connect( 'home' ))
