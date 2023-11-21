@@ -3,6 +3,9 @@ import {NS, ProcessInfo, Server} from "../NetscriptDefinitions"
 import {ServerList} from "../lib/ServerList"
 import { disableNSFunctionLogging } from "../lib/utils"
 
+const config = {
+  thread_filter: 5,
+}
 interface CustomProcessInfo extends ProcessInfo {
   target_server_name:     string
   script_host_name:       string
@@ -39,7 +42,7 @@ export async function main ( ns: NS ) {
     let proc_data: CustomProcessInfo[] = []
     getExtendedProcessInfo(server_lists.all_servers.map(s=>s.hostname), proc_data)
     
-    let filtered_proc_data = proc_data.filter(p=>p.threads >= 5)
+    let filtered_proc_data = proc_data.filter(p=>p.threads >= config.thread_filter)
     filtered_proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
 
     printExtendedProcessData(filtered_proc_data, script_host_ram, script_host_max_ram )
