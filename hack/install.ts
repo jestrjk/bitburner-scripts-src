@@ -40,10 +40,6 @@ export async function main(ns:NS) {
 		ns.print( JSON.stringify( script_hosts, null, 1))
 		let script_host_names 	= script_hosts.map(s=>s.hostname)
 
-		for ( let target_server of target_servers ) {
-			root_server(ns, target_server )			
-		}
-	
 		// Start da haxoring!
 		for( let target_server of target_servers ) {
 			//ns.clearLog()
@@ -165,20 +161,7 @@ export async function main(ns:NS) {
 			return lite_script_is_running
 	}
 	
-	function root_server( ns: NS, target_server: Server ) {
-		if ( target_server.hasAdminRights ) { return true } else {
-			let root_kit = new RootKit(ns, target_server ) 
-			let rooted = root_kit.run()
-			ns.print( `[${target_server.hostname}] rooted: ${rooted}` )
-			target_server = ns.getServer(target_server.hostname)
-			
-			if ( target_server.hasAdminRights ) { return true } else {
-				console.log ( `${colors.brightRed} skipping ${target_server.hostname} - could not root kit it`)
-				return false
-			} 
-		}
-		//no reach
-	}
+	
 
 	function killRunningLiteScripts(ns: NS, script_host_name: string) {
 		ns.ps(script_host_name)

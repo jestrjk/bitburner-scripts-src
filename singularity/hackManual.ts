@@ -8,7 +8,11 @@ interface NetworkNode {
 }
 
 export function autocomplete(data:any, args:any) {
-  return [...data.servers, ...data.script.scripts]
+  let results = []
+  if ( data.servers ) results.push( ...data.servers )
+  if ( data.scripts ) results.push( ...data.scripts )
+
+  return results
 }
 
 export async function main(ns:NS) {

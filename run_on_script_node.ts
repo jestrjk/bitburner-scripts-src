@@ -34,8 +34,9 @@ export async function main (ns:NS) {
   // --- main.functions ---
   function findScriptHostAndRun():boolean {
     let sh = new ServerList(ns)
-    
-    for( let script_host of sh.all_servers) {
+    let hacked_servers = sh.all_servers.filter(s=>s.hasAdminRights)
+
+    for( let script_host of hacked_servers) {
       let ram_available = script_host.maxRam - script_host.ramUsed
       if ( ram_available > script_ram_required ) {
         let pid = ns.exec( script_to_run_name, script_host.hostname, threads, ...script_args )

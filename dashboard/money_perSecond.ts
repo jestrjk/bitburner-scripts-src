@@ -17,8 +17,8 @@ export async function main(ns:NS) {
   let ROLLING_TIME_SECONDS = 20
 
   let [ window_width, window_height] = ns.ui.windowSize()
-  let desired_tail_width    = 200
-  let desired_tail_height   = 100
+  let desired_tail_width    = 250
+  let desired_tail_height   = 110
   ns.moveTail(window_width-desired_tail_width, window_height-desired_tail_height-5)
   ns.resizeTail(desired_tail_width,desired_tail_height)
 
@@ -66,8 +66,9 @@ export async function main(ns:NS) {
 
     //p( `average_difference: ${average_difference}`)
     //p( `Difference History: ${JSON.stringify(difference_history.map(d=>d.diff).map(d=>d.toFixed(3)))}`)
-    p( `Money: ${ns.formatNumber(average_money_difference_per_period,1)}/${ROLLING_TIME_SECONDS}s ${NaN?`(NaN)`:``} ${printDot(ns,dot_info)}`)
-    p( `Karma: ${player.numPeopleKilled *3} / 54000` ) 
+    p( `Money   : ${ns.formatNumber(player.money)}`)
+    p( `Money/s : ${ns.formatNumber(average_money_difference_per_period,1)}/${ROLLING_TIME_SECONDS}s ${NaN?`(NaN)`:``} ${printDot(ns,dot_info)}`)
+    p( `Karma   : ${player.numPeopleKilled *3}/54000` ) 
 
     await ns.asleep( 1000 )
   }//while(true)

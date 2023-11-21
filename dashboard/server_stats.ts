@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { NS, Server } from '../NetscriptDefinitions'
 import * as lib_args from '../lib/argumentProcessor'
-import { toMillionsFormatted } from '../lib/utils'
+import { colors, toMillionsFormatted } from '../lib/utils'
 import { ServerList } from '../lib/ServerList'
 
 interface Server_Info_Extended extends Server {
@@ -58,7 +58,11 @@ export async function main(ns : NS) {
 			
 			let hasAdminRights = s.hasAdminRights? "ROOT":"----"
 
+			let line_color = colors.reset
+			if ( s.moneyMax === 0 ) line_color = colors.brightCyan
+			
 			ns.print ( 
+				`${line_color}` + 
 				`${s.hostname}`																					.padEnd( 24 ) +
 				`${s.requiredHackingSkill}`															.padEnd(8) +
 				`${toMillionsFormatted( s.moneyAvailable as number )}`	.padEnd(12) +

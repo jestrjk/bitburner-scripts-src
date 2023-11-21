@@ -30,9 +30,12 @@ export async function main ( ns: NS ) {
 
     let script_host_ram = 0
     let script_host_max_ram = 0
-    for ( let script_host of server_lists.all_servers ) {
-      let max_ram = script_host.maxRam 
-      let used_ram  = script_host.ramUsed
+
+    let hacked_servers = server_lists.all_servers.filter( s=>s.hasAdminRights )
+
+    for ( let hacked_server of hacked_servers ) {
+      let max_ram = hacked_server.maxRam 
+      let used_ram  = hacked_server.ramUsed
       let available_host_ram = max_ram - used_ram
       
       script_host_max_ram  += max_ram
@@ -40,7 +43,7 @@ export async function main ( ns: NS ) {
     }
 
     let proc_data: CustomProcessInfo[] = []
-    getExtendedProcessInfo(server_lists.all_servers.map(s=>s.hostname), proc_data)
+    getExtendedProcessInfo(hacked_servers.map(s=>s.hostname), proc_data)
     
     let filtered_proc_data = proc_data.filter(p=>p.threads >= config.thread_filter)
     filtered_proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )

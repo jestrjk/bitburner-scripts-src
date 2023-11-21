@@ -6,3 +6,11 @@ export async function main(ns:NS) {
 
   pather.goToTarget()
 }
+
+export function autocomplete(data:any, args:any) {
+  let results = []
+  if ( data.servers ) results.push( ...data.servers )
+  if ( data.scripts ) results.push( ...data.scripts )
+
+  return results
+}
