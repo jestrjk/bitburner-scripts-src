@@ -22,7 +22,7 @@ export async function main(ns:NS) {
   while ( true ) {
     for ( let target of target_servers) {
       let server_path = new ServerPath(ns,ns.singularity.getCurrentServer(), target )
-      server_path.goToTarget()
+      server_path.goToTarget(target)
 
       await ns.singularity.manualHack()
     }

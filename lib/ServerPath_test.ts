@@ -7,7 +7,12 @@ export async function main(ns:NS) {
   ns.disableLog( "sleep" )
   ns.disableLog( "asleep" )
 
-  let server_path = new ServerPath( ns, <string> ns.args[0], <string>ns.args[1] )
+  let source = <string> ns.args[0]
+  let target = <string> ns.args[1]
+
+  ns.print( `${source} => ${target}`)
+
+  let server_path = new ServerPath( ns, source,target  )
   
   ns.print( `Path: ${JSON.stringify( server_path.path, null, 1)}`)
   ns.print( `Visited: ${JSON.stringify( server_path.visited, null, 1)}`)
