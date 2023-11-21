@@ -6,11 +6,11 @@ export class ServerPath {
     this._start_node_name = start_node_name
     this._target_node_name = target_node_name
 
-    if(this.findPath( start_node_name )) {
-      ns.print(`Found Path`)
-    }else {
-      ns.print(`Could not find Path`)
-    }
+    // if(this.findPath( start_node_name )) {
+    //   ns.print(`Found Path`)
+    // }else {
+    //   ns.print(`Could not find Path`)
+    // }
   }
 
   private _ns:NS

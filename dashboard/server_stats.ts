@@ -1,8 +1,8 @@
 /* eslint-disable */
 import { NS, Server } from '../NetscriptDefinitions'
 import * as lib_args from '../lib/argumentProcessor'
-import { getAllServers, getScriptHosts} from '../lib/ServerList'
 import { toMillionsFormatted } from '../lib/utils'
+import { ServerList } from '../lib/ServerList'
 
 interface Server_Info_Extended extends Server {
 	weaken_time: number
@@ -22,12 +22,12 @@ export async function main(ns : NS) {
 	ns.moveTail( 1450, 0 )
 	ns.resizeTail( 1050, 800 )
 	
-	let alternate = true
-	
 	while ( true ) {
-		let all_servers : Server[] = getAllServers(ns)
+		let server_list = new ServerList(ns)
+		let all_servers : Server[] = server_list.all_servers
 		let mapped_servers = all_servers.map( (target_server) => map_server_data(target_server))	
 
+		
 		ns.clearLog()
 
 		let byHackingLevelLimit = ( server: any ) => ( server.hacking_level_required < hacking_level_limit ) 
@@ -38,13 +38,7 @@ export async function main(ns : NS) {
 		
 		function sortByReqHackSkill_Ascending(a:any,b:any) { return ( a.requiredHackingSkill! - b.requiredHackingSkill!) }
 		function sortByReqHackSkill_Descending(a:any,b:any) { return ( b.requiredHackingSkill! - a.requiredHackingSkill!) }
-		let sortByReqHackSkill_AlternatingDirection = sortByReqHackSkill_Ascending
 		
-		alternate = !alternate
-		if (alternate) 
-					{ sortByReqHackSkill_AlternatingDirection = sortByReqHackSkill_Ascending } 
-		else 	{ sortByReqHackSkill_AlternatingDirection = sortByReqHackSkill_Descending }
-
 		let sorted_servers = mapped_servers.sort( sortByReqHackSkill_Ascending )
 
 		let printHeaders = () => ns.print( 
@@ -111,3 +105,5 @@ export async function main(ns : NS) {
 	
 	function toMinutes( seconds: number ): string { return (seconds/1000/60).toFixed( 1 )}
 } // main()
+
+// FUNCTIONS

@@ -14,7 +14,7 @@ interface Difference {
 export async function main(ns:NS) {
   ns.tail()
   
-  let ROLLING_TIME_SECONDS = 5
+  let ROLLING_TIME_SECONDS = 20
 
   let [ window_width, window_height] = ns.ui.windowSize()
   let desired_tail_width    = 200

@@ -1,10 +1,14 @@
 import {NS} from "../NetscriptDefinitions"
-import {getUtilityHosts,getAllServers} from "../lib/ServerList"
 import { ServerPath } from "../lib/ServerPath"
+
 
 interface NetworkNode {
   node_name: string
   child_nodes: NetworkNode[]
+}
+
+export function autocomplete(data:any, args:any) {
+  return [...data.servers, ...data.script.scripts]
 }
 
 export async function main(ns:NS) {
@@ -17,11 +21,8 @@ export async function main(ns:NS) {
 
   while ( true ) {
     for ( let target of target_servers) {
-      
       let server_path = new ServerPath(ns,ns.singularity.getCurrentServer(), target )
-      ns.print( `Pathing from ${ns.singularity.getCurrentServer()} to ${target}`)
       server_path.goToTarget()
-      ns.print( `Arrival: ${ns.singularity.getCurrentServer()}`)
 
       await ns.singularity.manualHack()
     }

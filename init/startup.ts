@@ -1,12 +1,13 @@
-import {NS} from "./NetscriptDefinitions"
+import {NS} from "../NetscriptDefinitions"
 
 let scripts = [
   "dashboard/server_stats.js",
   "dashboard/process_watcher.js",
-  "dashboard/PortManager_Statistics.js",
-  "dashboard/liteScript_Statistics.js",
   "dashboard/money_perSecond.js",
-  "hack/install.js"
+  //"dashboard/PortManager_Statistics.js",
+  //"dashboard/liteScript_Statistics.js",
+  "init/prepareScriptHosts.js",
+  "hack/install.js",
 ]
 
 export async function main(ns:NS) {

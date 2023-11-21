@@ -2,9 +2,9 @@
 import {NS, Server} from "../NetscriptDefinitions"
 import {RootKit} from "../lib/RooKit"
 import {colors, disableNSFunctionLogging} from "../lib/utils"
-import { getAllServers , getScriptHosts} from "../lib/ServerList"
+import {ServerList} from "../lib/ServerList"
 
-let lite_script_names = {
+let hack_script_names = {
 	weaken: "hack/weaken.js",
 	grow: "hack/grow.js",
 	hack: "hack/hack.js",
@@ -22,19 +22,21 @@ export async function main(ns:NS) {
 
 	await ns.sleep( 5000 )
 	while ( true ) {
-		let target_servers: Server[] = []
-		let all_servers = getAllServers(ns)
+		let server_lists = new ServerList(ns)
+		let all_servers = server_lists.all_servers
 		let all_server_names 			= all_servers.map( s=>s.hostname )
+
+		let target_servers: Server[] = []
 
 		if ( arg_target_servers.length > 0 ) {
 			target_servers = arg_target_servers
 		} else {
-			target_servers = getAllServers(ns)
+			target_servers = all_servers
 		}
 
 		ns.print( `target_servers: ${JSON.stringify( target_servers.map(s=>s.hostname))}`)
 
-		let script_hosts 		  	= getScriptHosts(ns,all_servers) 
+		let script_hosts 		  	= server_lists.script_hosts
 		ns.print( JSON.stringify( script_hosts, null, 1))
 		let script_host_names 	= script_hosts.map(s=>s.hostname)
 
@@ -42,9 +44,7 @@ export async function main(ns:NS) {
 			root_server(ns, target_server )			
 		}
 	
-		prepareScriptHosts(ns,script_host_names)
 		// Start da haxoring!
-		
 		for( let target_server of target_servers ) {
 			//ns.clearLog()
 						
@@ -52,7 +52,7 @@ export async function main(ns:NS) {
 
 			let target_server_name = target_server.hostname
 
-			for ( let script_host_name of script_host_names ) {
+			for ( let script_host_name of server_lists.all_servers.map(s=>s.hostname) ) {
 
 				if ( ! ns.serverExists( script_host_name ) ) { ns.print( `[${target_server.hostname}] ${script_host_name} does not exist`); continue; }
 
@@ -71,7 +71,7 @@ export async function main(ns:NS) {
 					let weaken_amount 					= ns.weakenAnalyze(100, target_server.cpuCores )
 					let weaken_threads 					= 100 ; 		// TODO TODO TODO Fix this to dynamic calc
 
-					exec_script( script_host_name, target_server_name, lite_script_names.weaken, weaken_threads, weaken_time  ) 
+					exec_script( script_host_name, target_server_name, hack_script_names.weaken, weaken_threads, weaken_time  ) 
 				} else { 
 					ns.print( `[${target_server.hostname}] ${colors.yellow}growth hack conditions not met`)
 				}
@@ -81,14 +81,14 @@ export async function main(ns:NS) {
 					let growth_money_ratio   		= target_max_money / Math.max( target_money, 1 )
 					let growth_threads 					= Math.max( Math.floor( ns.growthAnalyze( target_server_name, growth_money_ratio, ns.getServer(script_host_name).cpuCores )), 1 );
 					
-					exec_script( script_host_name, target_server_name, lite_script_names.grow, growth_threads, grow_time ) 
+					exec_script( script_host_name, target_server_name, hack_script_names.grow, growth_threads, grow_time ) 
 				} else{ ns.print( `[${target_server.hostname}] ${colors.yellow}growth hack conditions not met`)}
 				
 				if ( target_money >= .95 * target_max_money ) {
 					let hack_time 			= ns.getHackTime( target_server_name )
 					let hack_threads   = Math.max( Math.floor( ns.hackAnalyzeThreads(target_server_name, Math.floor( target_max_money*.50 ))) , 1)
 					
-					exec_script( script_host_name, target_server_name, lite_script_names.hack, hack_threads, hack_time ) 
+					exec_script( script_host_name, target_server_name, hack_script_names.hack, hack_threads, hack_time ) 
 				} else{ ns.print( `[${target_server.hostname}] ${colors.yellow}money hack conditions not met`)}
 			}
 
@@ -99,15 +99,6 @@ export async function main(ns:NS) {
 
 
 	// ------- Function Definitions -------
-
-	function prepareScriptHosts(ns: NS, script_host_names: string[]) {
-		for (let script_host_name of script_host_names) {
-			if (ns.serverExists(script_host_name)) {
-				// killRunningLiteScripts(ns, script_host_name)
-				installHackingScripts(ns, script_host_name)
-			}
-		}
-	}
 
 	// function defs main->fn
 	
@@ -163,11 +154,7 @@ export async function main(ns:NS) {
 		} else { return false }
 	}
 	
-	function installHackingScripts( ns: NS,script_host_name: string ) {
-		let lite_script_names_values = Object.values( lite_script_names )
-		lite_script_names_values.push( "lib/PortManager.js")
-			ns.scp( lite_script_names_values, script_host_name, 'home' )
-	}
+	
 
 	function isLiteScriptRunning(script_host_name: string) {
 			let proc_list = ns.ps(script_host_name)

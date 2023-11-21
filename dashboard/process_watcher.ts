@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {NS, ProcessInfo, Server} from "../NetscriptDefinitions"
-import {getAllServers, getScriptHosts} from "../lib/ServerList"
+import {ServerList} from "../lib/ServerList"
 import { disableNSFunctionLogging } from "../lib/utils"
 
 interface CustomProcessInfo extends ProcessInfo {
@@ -23,25 +23,26 @@ export async function main ( ns: NS ) {
   ns.clearLog()
 
   while ( true ) {
-    let all_servers           = getAllServers(ns)
-    let all_script_hosts      = getScriptHosts(ns, all_servers)
-    let all_script_host_names = all_script_hosts.map(s=>s.hostname)
+    let server_lists          = new ServerList(ns)
 
     let script_host_ram = 0
     let script_host_max_ram = 0
-    for ( let script_host_name of all_script_host_names ) {
-      let max_ram = ns.getServerMaxRam( script_host_name ) 
-      let used_ram  = ns.getServerUsedRam( script_host_name )
+    for ( let script_host of server_lists.all_servers ) {
+      let max_ram = script_host.maxRam 
+      let used_ram  = script_host.ramUsed
+      let available_host_ram = max_ram - used_ram
       
       script_host_max_ram  += max_ram
-      script_host_ram += max_ram - used_ram
+      script_host_ram += available_host_ram
     }
 
     let proc_data: CustomProcessInfo[] = []
-    getExtendedProcessInfo(all_script_host_names, proc_data)
+    getExtendedProcessInfo(server_lists.all_servers.map(s=>s.hostname), proc_data)
     
-    proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
-    printExtendedProcessData(proc_data, script_host_ram, script_host_max_ram )
+    let filtered_proc_data = proc_data.filter(p=>p.threads >= 5)
+    filtered_proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
+
+    printExtendedProcessData(filtered_proc_data, script_host_ram, script_host_max_ram )
     
     await ns.sleep( 1000 )
   }
@@ -60,7 +61,7 @@ export async function main ( ns: NS ) {
       let trs  = proc.time_required_seconds.toString().padStart(2,'0')
 
       ns.print(`[${proc.pid}] `.padEnd( 10 ) +
-        `${proc.script_host_name}: `.padEnd(8) +
+        `${proc.script_host_name}: `.padEnd(18) +
         `${proc.filename.slice(5).slice(0, -3)} `.padEnd(15) +
         `${proc.target_server_name} `.padEnd(18) +
         `(t=${proc.threads})`.padEnd(8) +
