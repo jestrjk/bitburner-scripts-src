@@ -9,7 +9,7 @@ export async function main (ns:NS) {
 
   while (true) {
     test(ns,script_name)
-    let server = broker.getServer(ns.getHostname())
+    let server = broker.getServerData(ns.getHostname())
     ns.print( JSON.stringify({
       hostame: server.hostname,
       money: server.moneyAvailable

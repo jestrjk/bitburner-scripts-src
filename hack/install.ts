@@ -1,8 +1,7 @@
 /* eslint-disable */
 import {NS, Server} from "../NetscriptDefinitions"
-import {RootKit} from "../lib/RooKit"
 import {colors, disableNSFunctionLogging} from "../lib/utils"
-import {ServerList} from "../lib/ServerList"
+import { DataBroker } from "../global_data"
 
 let hack_script_names = {
 	weaken: "hack/weaken.js",
@@ -23,27 +22,29 @@ export async function main(ns:NS) {
 	
 	disableNSFunctionLogging(ns)
 
-	let arg_target_servers = ns.args.map(arg=>ns.getServer(arg as string))
-	ns.print(`arg_target_servers: ${JSON.stringify( arg_target_servers.map(s=>s.hostname))}`)
+	//let arg_target_servers = ns.args.map(arg=>ns.getServer(arg as string))
+	// ns.print(`arg_target_servers: ${JSON.stringify( arg_target_servers.map(s=>s.hostname))}`)
+	
+	let broker = new DataBroker() 
 
 	await ns.sleep( 2000 )
 	while ( true ) {
-		let server_lists = new ServerList(ns)
-		let all_servers = server_lists.all_servers
-		let all_server_names 			= all_servers.map( s=>s.hostname )
+		//let server_lists = broker.all_servers
+		let all_servers = () => broker.all_servers
+		let all_server_names 			= all_servers().map( s=>s.hostname )
 
 		let target_servers: Server[] = []
 
-		if ( arg_target_servers.length > 0 ) {
-			target_servers = arg_target_servers
-		} else {
-			target_servers = all_servers
-		}
+		// if ( arg_target_servers.length > 0 ) {
+		// 	target_servers = arg_target_servers
+		// } else {
+			target_servers = all_servers()
+		//}
 
 		ns.print( `target_servers: ${JSON.stringify( target_servers.map(s=>s.hostname))}`)
 
-		let script_hosts 		  	= server_lists.all_servers.filter(h=>h.hasAdminRights && ((h.maxRam-h.ramUsed) > 16))
-		ns.print(`INFO Script Hosts ${script_hosts.length}/${server_lists.script_hosts.length}`)
+		let script_hosts 		  	= all_servers().filter(h=>h.hasAdminRights && ((h.maxRam-h.ramUsed) > 16))
+		ns.print(`INFO Script Hosts ${script_hosts.length}/${broker.script_hosts.length}`)
 		script_hosts.sort( (a,b)=>a.maxRam-b.maxRam )
 		await ns.sleep( 1000 )
 
@@ -80,19 +81,22 @@ export async function main(ns:NS) {
 					target_server_name
 				} 
 				
+				let server_analysis					= broker.getAnalysisData(target_server_name)
+
 				// Script conditions
 				if ( target_current_security >= 10 + target_min_security ) {
 					let weaken_time 						= ns.getWeakenTime( target_server_name )
-					let weaken_amount 					= ns.weakenAnalyze(100, target_server.cpuCores )
+					let weaken_amount 					= server_analysis.weakenAnalyseData
 					let weaken_threads 					= 100 ; 		// TODO TODO TODO Fix this to dynamic calc
 
 					exec_script( script_host, script_hosts, target_server_name, hack_script_names.weaken, weaken_threads, weaken_time  ) 
 				} else { err( errOptions, "weaken()" ) }
 
 				if ( target_money < .95 * target_max_money ) {
-					let grow_time 							= ns.getGrowTime( target_server_name)
+
+					let grow_time 							= server_analysis.growtimeData
 					let growth_money_ratio   		= target_max_money / Math.max( target_money, 1 )
-					let growth_threads 					= Math.max( Math.floor( ns.growthAnalyze( target_server_name, growth_money_ratio, ns.getServer(script_host_name).cpuCores )), 1 );
+					let growth_threads 					= server_analysis.growthAnalyzeData
 					
 					exec_script( script_host, script_hosts, target_server_name, hack_script_names.grow, growth_threads, grow_time ) 
 				} else{ err( errOptions, "grow()" )}
