@@ -1,1 +1,0 @@
-This file contains the list of potential API break. A pattern was used to look through all your files and note the spots where you might have a problem. Not everything here is broken.
