@@ -1,10 +1,114 @@
-import {NS} from "../NetscriptDefinitions"
+import {NS,Player,Server} from "../NetscriptDefinitions"
 import { ServerPath } from "../lib/ServerPath"
-
+import { ServerList } from "../lib/ServerList"
 
 interface NetworkNode {
   node_name: string
   child_nodes: NetworkNode[]
+}
+interface HackTarget {
+  player: Player
+  hacking_money_ratio: number
+  money_available: number
+  server: Server
+  ratio: number
+  hack_success_chance: number
+  hack_time: number
+}
+
+export async function main(ns:NS) {
+  ns.tail()
+  //ns.disableLog( "sleep")
+  //ns.disableLog( "scan")
+  ns.disableLog( "scan" )
+  
+  while ( true ) {
+    let server_list_orig = new ServerList(ns)
+    let non_purchased_servers_with_money = server_list_orig.all_servers.filter(s=>!s.purchasedByPlayer&&(s.moneyMax??0) > 0)
+  
+    let best_to_hack:HackTarget  = pickBestToHack(ns, non_purchased_servers_with_money)
+    let bth = best_to_hack
+    
+    let print_version = {
+      name:             bth.server?.hostname,
+      ratio:            bth.ratio.toFixed(2),
+      money_available:  ns.formatNumber(bth.server.moneyAvailable??0),
+      hacking_money:    ns.formatNumber(bth.hacking_money_ratio),
+      max_money:        ns.formatNumber(bth.server.moneyMax??0),
+      hacking_chance:   bth.hack_success_chance.toFixed(2),
+      hacking_time:     `${Math.floor((bth.hack_time/1000))}s`,
+    }
+    //ns.print( JSON.stringify( print_version, null, 1 ) )
+  
+    let server_path = new ServerPath(ns,ns.singularity.getCurrentServer(), bth.server.hostname )
+    server_path.goToTarget()
+
+    await ns.singularity.manualHack()
+    
+  }
+}
+
+function pickBestToHack( ns:NS, target_servers:Server[] ): HackTarget {
+  let player = ns.getPlayer()
+  let best_hack_target:HackTarget = {
+    player: player,
+    hacking_money_ratio: 0,
+    money_available: 0,
+    server: target_servers[0],
+    ratio: 0,
+    hack_success_chance: 0,
+    hack_time: 1,
+  }
+
+  for( let current_target_server of target_servers) {
+    if ( !current_target_server.hasAdminRights ) continue
+    
+    let current_hack_target = getHackTarget(ns, player,current_target_server )
+
+    // ns.print( `${current_hack_target.server.hostname}(${current_hack_target.ratio.toFixed(2)}) ` + 
+    //   `with ${best_hack_target.server.hostname}(${best_hack_target.ratio.toFixed(2)})`)
+
+    if ( current_hack_target.ratio > best_hack_target.ratio ) {
+      // ns.print( `${current_hack_target.server.hostname}(${current_hack_target.ratio.toFixed(2)}) ` + 
+      //   `has unseated ${best_hack_target.server.hostname}(${best_hack_target.ratio.toFixed(2)})`)
+
+      best_hack_target = current_hack_target
+    }
+  }
+  return best_hack_target
+}
+
+function calculateRatio(ns:NS, server:HackTarget ):number {
+  server.ratio = (( server.hacking_money_ratio * server.money_available * server.hack_success_chance) 
+    / (server.hack_time?server.hack_time:1) ) 
+
+  return server.ratio
+}
+
+function getHackTarget(ns:NS, player:Player, target_server:Server):HackTarget {
+  let hack_target_hostname              = target_server.hostname
+  let hack_target_hacktime              = ns.getHackTime(hack_target_hostname)
+  let hack_target_success_chance        = ns.hackAnalyzeChance(target_server.hostname)
+  let hack_target_hacking_money_ratio   = ns.hackAnalyze( hack_target_hostname )
+  let hack_target_available_money       = target_server.moneyAvailable??0
+  
+  let hackTarget:HackTarget = {
+    player,
+    server:               target_server,
+    ratio:                -1,
+    money_available:      hack_target_available_money,
+    hacking_money_ratio:  hack_target_hacking_money_ratio,
+    hack_time:            hack_target_hacktime,
+    hack_success_chance:  hack_target_success_chance,
+  }
+    
+  if ( hack_target_success_chance < .5 ) {
+    return hackTarget
+  } 
+  
+  calculateRatio( ns, hackTarget )
+
+  return hackTarget
 }
 
 export function autocomplete(data:any, args:any) {
@@ -15,20 +119,3 @@ export function autocomplete(data:any, args:any) {
   return results
 }
 
-export async function main(ns:NS) {
-  ns.tail()
-  //ns.disableLog( "sleep")
-  //ns.disableLog( "scan")
-  ns.disableLog( "scan" )
-  
-  let target_servers = <string[]>ns.args 
-
-  while ( true ) {
-    for ( let target of target_servers) {
-      let server_path = new ServerPath(ns,ns.singularity.getCurrentServer(), target )
-      server_path.goToTarget(target)
-
-      await ns.singularity.manualHack()
-    }
-  }
-}

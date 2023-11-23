@@ -67,7 +67,7 @@ export async function main ( ns: NS ) {
       let trs  = proc.time_required_seconds.toString().padStart(2,'0')
 
       ns.print(`[${proc.pid}] `.padEnd( 10 ) +
-        `${proc.script_host_name}: `.padEnd(18) +
+        `${proc.script_host_name}: `.padEnd(20) +
         `${proc.filename.slice(5).slice(0, -3)} `.padEnd(15) +
         `${proc.target_server_name} `.padEnd(18) +
         `(t=${proc.threads})`.padEnd(8) +
