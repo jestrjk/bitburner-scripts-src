@@ -1,11 +1,13 @@
 import {NS,Player,Server} from "../NetscriptDefinitions"
 import { ServerPath } from "../lib/ServerPath"
 import { ServerList } from "../lib/ServerList"
+import { DataBroker } from "../global_data"
 
 interface NetworkNode {
   node_name: string
   child_nodes: NetworkNode[]
 }
+
 interface HackTarget {
   player: Player
   hacking_money_ratio: number
@@ -16,15 +18,17 @@ interface HackTarget {
   hack_time: number
 }
 
+let broker = new DataBroker()
+
 export async function main(ns:NS) {
   ns.tail()
   //ns.disableLog( "sleep")
   //ns.disableLog( "scan")
   ns.disableLog( "scan" )
-  
+
   while ( true ) {
-    let server_list_orig = new ServerList(ns)
-    let non_purchased_servers_with_money = server_list_orig.all_servers.filter(s=>!s.purchasedByPlayer&&(s.moneyMax??0) > 0)
+    
+    let non_purchased_servers_with_money = broker.all_servers.filter(s=>!s.purchasedByPlayer&&(s.moneyMax??0) > 0)
   
     let best_to_hack:HackTarget  = pickBestToHack(ns, non_purchased_servers_with_money)
     let bth = best_to_hack
@@ -40,7 +44,7 @@ export async function main(ns:NS) {
     }
     //ns.print( JSON.stringify( print_version, null, 1 ) )
   
-    let server_path = new ServerPath(ns,ns.singularity.getCurrentServer(), bth.server.hostname )
+    let server_path = new ServerPath(ns,broker.data.singularity.current_server, bth.server.hostname )
     server_path.goToTarget()
 
     await ns.singularity.manualHack()
@@ -49,7 +53,7 @@ export async function main(ns:NS) {
 }
 
 function pickBestToHack( ns:NS, target_servers:Server[] ): HackTarget {
-  let player = ns.getPlayer()
+  let player = broker.data.player
   let best_hack_target:HackTarget = {
     player: player,
     hacking_money_ratio: 0,

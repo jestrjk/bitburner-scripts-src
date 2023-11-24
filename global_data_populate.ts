@@ -14,6 +14,7 @@ export async function main (ns:NS) {
     data.player = ns.getPlayer(),
     data.server_list = new ServerList(ns)
     data.server_analysis = {}
+    data.singularity = { current_server: ns.singularity.getCurrentServer() }
 
     for( let server of data.server_list.all_servers) {
         data.server_analysis![server.hostname] = {
@@ -22,6 +23,7 @@ export async function main (ns:NS) {
           growthAnalyzeData:              ns.growthAnalyze( server.hostname, 2 ),
           weakenAnalyseData:              ns.weakenAnalyze( 1 ),
           growtimeData:                   ns.getGrowTime( server.hostname ),
+          
         }
     }
     

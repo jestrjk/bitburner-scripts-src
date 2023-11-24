@@ -33,6 +33,9 @@ export async function main ( ns: NS ) {
 
     let hacked_servers = server_lists.all_servers.filter( s=>s.hasAdminRights )
 
+    let proc_data: CustomProcessInfo[] = []
+    getExtendedProcessInfo(hacked_servers.map(s=>s.hostname), proc_data)
+
     for ( let hacked_server of hacked_servers ) {
       let max_ram = hacked_server.maxRam 
       let used_ram  = hacked_server.ramUsed
@@ -40,17 +43,14 @@ export async function main ( ns: NS ) {
       
       script_host_max_ram  += max_ram
       script_host_ram += available_host_ram
+  
+      let filtered_proc_data = proc_data.filter(p=>p.threads >= config.thread_filter)
+      filtered_proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
+
+      printExtendedProcessData(filtered_proc_data, script_host_ram, script_host_max_ram )
+      
+      await ns.sleep( 1000 )
     }
-
-    let proc_data: CustomProcessInfo[] = []
-    getExtendedProcessInfo(hacked_servers.map(s=>s.hostname), proc_data)
-    
-    let filtered_proc_data = proc_data.filter(p=>p.threads >= config.thread_filter)
-    filtered_proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
-
-    printExtendedProcessData(filtered_proc_data, script_host_ram, script_host_max_ram )
-    
-    await ns.sleep( 1000 )
   }
 
   function printExtendedProcessData(proc_data: CustomProcessInfo[], script_host_ram:number, script_host_max_ram:number ) {
