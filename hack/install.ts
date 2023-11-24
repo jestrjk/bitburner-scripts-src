@@ -48,7 +48,7 @@ export async function main(ns:NS) {
 		for( let target_server of target_servers ) {
 			//ns.clearLog()
 
-			let script_hosts 		  	= all_servers().filter(h=>h.hasAdminRights && ((h.maxRam-h.ramUsed) > 16))
+			let script_hosts 		  	= all_servers().filter(h=>h.hasAdminRights )
 			ns.print(`INFO Script Hosts ${script_hosts.length}/${broker.script_hosts.length}`)
 			script_hosts.sort( (a,b)=>a.maxRam-b.maxRam )	
 						
@@ -58,10 +58,9 @@ export async function main(ns:NS) {
 
 			let target_server_name = target_server.hostname
 
-			//for ( let script_host of script_hosts ) {
-
 			let priority_script_hosts = script_hosts.slice(0).sort( (a,b)=>(b.maxRam-b.ramUsed)-(a.maxRam-a.ramUsed))
 			let script_host = priority_script_hosts[0]
+
 			ns.print( priority_script_hosts.map(s=>{return {
 				hostname: s.hostname,
 				maxRam:		s.maxRam,
@@ -69,56 +68,54 @@ export async function main(ns:NS) {
 				ramAvailable: s.maxRam - s.ramUsed
 			}}) )
 
-				ns.print( `[${script_host.hostname}] ram ${script_host.maxRam-script_host.ramUsed}`)
+			ns.print( `[${script_host.hostname}] ram ${script_host.maxRam-script_host.ramUsed}`)
 
-				let script_host_name = script_host.hostname
+			let script_host_name = script_host.hostname
 
-				if ( ! ns.serverExists( script_host_name ) ) { 
-					ns.print( `[${target_server.hostname}] ${script_host_name} does not exist`); 
-					continue; 
-				}
+			if ( ! ns.serverExists( script_host_name ) ) { 
+				ns.print( `[${target_server.hostname}] ${script_host_name} does not exist`); 
+				continue; 
+			}
 
-				let target_money 							=	ns.getServerMoneyAvailable( target_server_name )
+			let target_money 							=	ns.getServerMoneyAvailable( target_server_name )
+			
+			let target_min_security 			= ns.getServerMinSecurityLevel( target_server_name )
+			let target_current_security 	= ns.getServerSecurityLevel( target_server_name ) 
+
+			ns.print( `[${script_host_name}] checking ${target_server_name}` )
+			
+			let errOptions:ErrOptions = {
+				ns,
+				script_host_name,
+				target_server_name
+			} 
+			
+			let server_analysis					= broker.getAnalysisData(target_server_name)
+
+			// Script conditions
+			if ( target_current_security >= 10 + target_min_security ) {
+				let weaken_time 						= ns.getWeakenTime( target_server_name )
+				let weaken_amount 					= server_analysis.weakenAnalyseData
+				let weaken_threads 					= 100 ; 		// TODO TODO TODO Fix this to dynamic calc
+
+				exec_script( script_host, script_hosts, target_server_name, hack_script_names.weaken, weaken_threads, weaken_time  ) 
+			} else { err( errOptions, "weaken()" ) }
+
+			if ( target_money < .8 * target_max_money ) {
+
+				let grow_time 							= server_analysis.growtimeData
+				let growth_threads 					= server_analysis.growthAnalyzeData
 				
-				let target_min_security 			= ns.getServerMinSecurityLevel( target_server_name )
-				let target_current_security 	= ns.getServerSecurityLevel( target_server_name ) 
-	
-				ns.print( `[${script_host_name}] checking ${target_server_name}` )
+				exec_script( script_host, script_hosts, target_server_name, hack_script_names.grow, growth_threads, grow_time ) 
+			} else{ err( errOptions, "grow()" )}
+			
+			if ( target_money >= .8 * target_max_money ) {
+				let hack_time 			= ns.getHackTime( target_server_name )
+				let hack_threads   = Math.max( Math.floor( ns.hackAnalyzeThreads(target_server_name, Math.floor( target_max_money*.75 ))) , 1)
 				
-				let errOptions:ErrOptions = {
-					ns,
-					script_host_name,
-					target_server_name
-				} 
-				
-				let server_analysis					= broker.getAnalysisData(target_server_name)
+				exec_script( script_host, script_hosts, target_server_name, hack_script_names.hack, hack_threads, hack_time ) 
+			} else{ err( errOptions, `hack() money: ${ns.formatNumber(target_money,1)} / ${ns.formatNumber(target_max_money,1)} }`)}
 
-				// Script conditions
-				if ( target_current_security >= 10 + target_min_security ) {
-					let weaken_time 						= ns.getWeakenTime( target_server_name )
-					let weaken_amount 					= server_analysis.weakenAnalyseData
-					let weaken_threads 					= 100 ; 		// TODO TODO TODO Fix this to dynamic calc
-
-					exec_script( script_host, script_hosts, target_server_name, hack_script_names.weaken, weaken_threads, weaken_time  ) 
-				} else { err( errOptions, "weaken()" ) }
-
-				if ( target_money < .8 * target_max_money ) {
-
-					let grow_time 							= server_analysis.growtimeData
-					let growth_threads 					= server_analysis.growthAnalyzeData
-					
-					exec_script( script_host, script_hosts, target_server_name, hack_script_names.grow, growth_threads, grow_time ) 
-				} else{ err( errOptions, "grow()" )}
-				
-				if ( target_money >= .8 * target_max_money ) {
-					let hack_time 			= ns.getHackTime( target_server_name )
-					let hack_threads   = Math.max( Math.floor( ns.hackAnalyzeThreads(target_server_name, Math.floor( target_max_money*.75 ))) , 1)
-					
-					exec_script( script_host, script_hosts, target_server_name, hack_script_names.hack, hack_threads, hack_time ) 
-				} else{ err( errOptions, `hack() money: ${ns.formatNumber(target_money,1)} / ${ns.formatNumber(target_max_money,1)} }`)}
-
-				//await ns.sleep(100) // sanity sleep
-			//}
 			ns.print( `${colors.white}End script hosts`)
 			await ns.sleep ( 100 )
 		} // for target_servers 

@@ -28,29 +28,35 @@ export async function main ( ns: NS ) {
   while ( true ) {
     let server_lists          = new ServerList(ns)
 
-    let script_host_ram = 0
-    let script_host_max_ram = 0
+    
+    let hacked_servers:Server[] = server_lists.all_servers.filter( s=>s.hasAdminRights )
 
-    let hacked_servers = server_lists.all_servers.filter( s=>s.hasAdminRights )
+    let script_host_ram_info = getTotalRamUsedAvailable(hacked_servers)
 
     let proc_data: CustomProcessInfo[] = []
     getExtendedProcessInfo(hacked_servers.map(s=>s.hostname), proc_data)
 
-    for ( let hacked_server of hacked_servers ) {
-      let max_ram = hacked_server.maxRam 
-      let used_ram  = hacked_server.ramUsed
-      let available_host_ram = max_ram - used_ram
-      
-      script_host_max_ram  += max_ram
-      script_host_ram += available_host_ram
-  
-      let filtered_proc_data = proc_data.filter(p=>p.threads >= config.thread_filter)
-      filtered_proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
+    let filtered_proc_data = proc_data.filter(p=>p.threads >= config.thread_filter)
+    filtered_proc_data.sort( (procA, procB) => (procB.run_time_left - procA.run_time_left) )
 
-      printExtendedProcessData(filtered_proc_data, script_host_ram, script_host_max_ram )
-      
-      await ns.sleep( 1000 )
+    printExtendedProcessData(filtered_proc_data, script_host_ram_info.script_host_ram, script_host_ram_info.script_host_max_ram )
+
+    await ns.sleep( 1000 )
+  }
+
+  function getTotalRamUsedAvailable(hacked_servers: Server[]) {
+    let script_host_max_ram = 0
+    let script_host_ram = 0
+
+    for (let hacked_server of hacked_servers) {
+      let max_ram = hacked_server.maxRam
+      let used_ram = hacked_server.ramUsed
+      let available_host_ram = max_ram - used_ram
+
+      script_host_max_ram += max_ram
+      script_host_ram += available_host_ram
     }
+    return { script_host_max_ram, script_host_ram }
   }
 
   function printExtendedProcessData(proc_data: CustomProcessInfo[], script_host_ram:number, script_host_max_ram:number ) {
