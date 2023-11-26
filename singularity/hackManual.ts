@@ -1,7 +1,7 @@
 import {NS,Player,Server} from "../NetscriptDefinitions"
 import { ServerPath } from "../lib/ServerPath"
 import { ServerList } from "../lib/ServerList"
-import { DataBroker } from "../global_data"
+import { DataBroker } from "../global_data/data"
 
 interface NetworkNode {
   node_name: string
@@ -22,6 +22,9 @@ let broker = new DataBroker()
 
 export async function main(ns:NS) {
   ns.tail()
+  ns.moveTail(1450, 610)
+  ns.resizeTail( 1050, 200)
+
   //ns.disableLog( "sleep")
   //ns.disableLog( "scan")
   ns.disableLog( "scan" )
@@ -90,10 +93,13 @@ function calculateRatio(ns:NS, server:HackTarget ):number {
 }
 
 function getHackTarget(ns:NS, player:Player, target_server:Server):HackTarget {
+
+  let server_analysis = broker.data.server_analysis[target_server.hostname]
+
   let hack_target_hostname              = target_server.hostname
-  let hack_target_hacktime              = ns.getHackTime(hack_target_hostname)
-  let hack_target_success_chance        = ns.hackAnalyzeChance(target_server.hostname)
-  let hack_target_hacking_money_ratio   = ns.hackAnalyze( hack_target_hostname )
+  let hack_target_hacktime              = server_analysis.hack_time_required
+  let hack_target_success_chance        = server_analysis.hack_success_chance
+  let hack_target_money_ratio           = server_analysis.hack_money_ratio_stolen
   let hack_target_available_money       = target_server.moneyAvailable??0
   
   let hackTarget:HackTarget = {
@@ -101,7 +107,7 @@ function getHackTarget(ns:NS, player:Player, target_server:Server):HackTarget {
     server:               target_server,
     ratio:                -1,
     money_available:      hack_target_available_money,
-    hacking_money_ratio:  hack_target_hacking_money_ratio,
+    hacking_money_ratio:  hack_target_money_ratio,
     hack_time:            hack_target_hacktime,
     hack_success_chance:  hack_target_success_chance,
   }

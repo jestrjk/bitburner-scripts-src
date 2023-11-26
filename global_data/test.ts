@@ -1,5 +1,5 @@
-import { NS } from "./NetscriptDefinitions";
-import { DataBroker, data } from "./global_data"
+import { NS } from "../NetscriptDefinitions";
+import { DataBroker, data } from "./data"
 
 const script_name = "./global_data_populate.js"
 export async function main (ns:NS) {

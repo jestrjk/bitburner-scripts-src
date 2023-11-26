@@ -1,6 +1,6 @@
-import { NS } from "./NetscriptDefinitions";
-import { ServerList } from "./lib/ServerList";
-import { data } from "./global_data"
+import { NS } from "../NetscriptDefinitions";
+import { ServerList } from "../lib/ServerList";
+import { data } from "./data"
 
 export async function main (ns:NS) {
   ns.tail() 
@@ -19,10 +19,13 @@ export async function main (ns:NS) {
     for( let server of data.server_list.all_servers) {
         data.server_analysis![server.hostname] = {
           hostname:                   server.hostname,
-          hackAnalyzeThreadsData:         ns.hackAnalyzeThreads(server.hostname, (server.moneyMax??0)/2),
-          growthAnalyzeData:              ns.growthAnalyze( server.hostname, 2 ),
-          weakenAnalyseData:              ns.weakenAnalyze( 1 ),
-          growtimeData:                   ns.getGrowTime( server.hostname ),
+          hack_time_required:         ns.getHackTime(server.hostname),
+          hack_money_ratio_stolen:    ns.hackAnalyze(server.hostname),
+          hack_threads_for_75percent: ns.hackAnalyzeThreads(server.hostname, (server.moneyMax??0)*.75),
+          hack_success_chance:        ns.hackAnalyzeChance(server.hostname),
+          growthAnalyzeData:          ns.growthAnalyze( server.hostname, 2 ),
+          weakenAnalyseData:          ns.weakenAnalyze( 1 ),
+          grow_time_required:         ns.getGrowTime( server.hostname ),
           
         }
     }

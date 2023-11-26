@@ -1,12 +1,15 @@
-import { Player, Server } from "./NetscriptDefinitions"
-import { ServerList } from "./lib/ServerList"
+import { Player, Server } from "../NetscriptDefinitions"
+import { ServerList } from "../lib/ServerList"
 
 export interface ServerAnalysisData {
-  hostname: string
-  weakenAnalyseData: number
-  growthAnalyzeData: number
-  hackAnalyzeThreadsData: number
-  growtimeData: number
+  hostname:                   string
+  weakenAnalyseData:          number
+  growthAnalyzeData:          number
+  hack_time_required:         number
+  hack_money_ratio_stolen:    number
+  hack_success_chance:        number
+  hack_threads_for_75percent: number
+  grow_time_required:         number
 }
 
 export interface ServerAnalysis {

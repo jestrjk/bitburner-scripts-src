@@ -4,7 +4,6 @@ import * as PM from "../lib/PortManager"
 
 export async function main(ns: NS) {
   try {
-    let pm = PM.getPortManager(ns, PM.PortNumbers.liteScriptResults )
 
     let target:string = ns.args[0] as string
     let grow_result = await ns.grow( target ) 
@@ -14,8 +13,7 @@ export async function main(ns: NS) {
       hostname: target, 
       hacktype: PM.hackTypes.grow
     }
-
-    pm.writeJSONPort( result ) 
+    
   } catch(err) {throw err}
 }
 

@@ -6,11 +6,16 @@ import { colors } from "../lib/utils";
 export async function main(ns:NS) {
   ns.tail() 
   ns.disableLog( "scp" )
+  ns.disableLog( "brutessh")
+  ns.disableLog( "ftpcrack")
+  ns.disableLog( "relaysmtp")
+  ns.disableLog( "httpworm")
+  ns.disableLog( "sqlinject")
   
   while(true) {
     let sl = new ServerList(ns)
     for( let server of sl.all_servers ) {
-      ns.print( `WARNING ${server.hostname}`)
+      //ns.print( `${colors.brightBlue}${server.hostname}`)
       //ns.print ( sl.all_servers.map( s=> s.hostname) )
       installScripts(ns, server)
       root_server(ns,server)
@@ -22,8 +27,10 @@ export async function main(ns:NS) {
 function installScripts( ns: NS,script_host: Server ) {
   if ( script_host.hasAdminRights) {
     let script_names_to_scp = ns.ls('home', ".js")
-    if ( !ns.scp( script_names_to_scp, script_host.hostname, 'home' ) ) {
-      ns.print( `Failed to scp to script_host.hostname`)
+    if ( ns.scp( script_names_to_scp, script_host.hostname, 'home' ) ) {
+      ns.print(`${colors.brightGreen}Success SCP ${script_host.hostname}`) 
+    } else {
+      ns.print( `ERROR Failed to scp to script_host.hostname`)
     }
   }
 }

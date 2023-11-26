@@ -20,7 +20,7 @@ export async function main(ns : NS) {
 
 	ns.tail( ns.pid )
 	ns.moveTail( 1450, 0 )
-	ns.resizeTail( 1050, 800 )
+	ns.resizeTail( 1050, 600 )
 	
 	while ( true ) {
 		let server_list = new ServerList(ns)

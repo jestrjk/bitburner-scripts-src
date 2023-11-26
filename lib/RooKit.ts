@@ -17,16 +17,17 @@ export class RootKit {
   run () {
     if ( this.target_server.hasAdminRights ) return true
 
-    
     let hack_level = this.ns.getHackingLevel()
-    this.ns.print( `hacking ${hack_level} / ${this.target_server.requiredHackingSkill??9999999}`)
+    //this.ns.print( `hacking ${hack_level} / ${this.target_server.requiredHackingSkill??9999999}`)
+
     if ((this.target_server.requiredHackingSkill ?? 9999999) > hack_level  ) return false
-    this.ns.print( `passed hacking level check`)
+    //this.ns.print( `passed hacking level check`)
+
     this.port_hacker.run( this.target_server.hostname )
     this.target_server = this.ns.getServer( this.target_server.hostname )
 
     if ( (this.target_server.numOpenPortsRequired ?? 0) > ( this.target_server.openPortCount ?? 0) ) {
-      this.ns.print( `returning because ports open / ports required: ${colors.brightRed}${this.target_server.openPortCount} / ${this.target_server.numOpenPortsRequired}` )
+      this.ns.print( `ERROR ports_open/ports_required: ${colors.brightRed}${this.target_server.openPortCount} / ${this.target_server.numOpenPortsRequired}` )
       return false
     }
 
@@ -60,14 +61,15 @@ export class PortHackingPrograms {
     for ( const program_name of this.program_list ) {
 
       if ( this.ns.fileExists( program_name ) ) {
-        this.ns.print( `[port_hacking] ${colors.brightGreen}${program_name}`)
+        //this.ns.print( `[port_hacking] ${colors.brightGreen}${program_name}`)
         this.active_programs.push ( program_name ) 
-      } else { this.ns.print( `[port_hacking] ${colors.brightRed}${program_name}`)} 
+      } else { this.ns.print( `ERROR [port_hacking] ${colors.brightRed}${program_name} does not exist`)} 
 
     }
   }	
 
   run( server_name: string ) {
+    
     for ( const program_name of this.active_programs ) {
       switch ( program_name ) {
         case "BruteSSH.exe":

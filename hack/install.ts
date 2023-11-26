@@ -1,7 +1,7 @@
 /* eslint-disable */
 import {NS, Server} from "../NetscriptDefinitions"
 import {colors, disableNSFunctionLogging} from "../lib/utils"
-import { DataBroker } from "../global_data"
+import { DataBroker } from "../global_data/data"
 
 let hack_script_names = {
 	weaken: "hack/weaken.js",
@@ -69,7 +69,7 @@ export async function main(ns:NS) {
 
 			if ( target_money < .8 * target_max_money ) {
 
-				let grow_time 							= server_analysis.growtimeData
+				let grow_time 							= server_analysis.grow_time_required
 				let growth_threads 					= server_analysis.growthAnalyzeData
 				
 				exec_script( script_host, script_hosts, target_server_name, hack_script_names.grow, growth_threads, grow_time ) 
@@ -145,7 +145,7 @@ function adjustThreadCount( ns: NS, script_host_name: string, host_max_ram: numb
 }
 
 function hostHasEnoughRam( ns:NS, ram_per_thread: number, host_max_ram: number, used_ram: number,  threads: number ) {
-	ns.print( `Checking if host ram/thread*threads(${(ram_per_thread*threads).toFixed(1)}) < total ram(${host_max_ram}-${used_ram})`)
+	// ns.print( `Checking if host ram/thread*threads(${(ram_per_thread*threads).toFixed(1)}) < total ram(${host_max_ram}-${used_ram})`)
 	if ( (ram_per_thread * threads) < ( host_max_ram - used_ram  ) ) {
 		return true ; 
 	} else { return false }

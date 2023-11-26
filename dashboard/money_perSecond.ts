@@ -18,7 +18,7 @@ export async function main(ns:NS) {
 
   let [ window_width, window_height] = ns.ui.windowSize()
   let desired_tail_width    = 250
-  let desired_tail_height   = 110
+  let desired_tail_height   = 140
   ns.moveTail(window_width-desired_tail_width, window_height-desired_tail_height-5)
   ns.resizeTail(desired_tail_width,desired_tail_height)
 
@@ -53,24 +53,26 @@ export async function main(ns:NS) {
       difference_history.push( current_difference )
     }
 
-    let differnce_times = difference_history.map( d=>Math.floor((d.timestamp/1000)))
-    let differnce_moneys = difference_history.map ( d=> ns.formatNumber( d.money ))
-    //p(`times and monies: ${js(differnce_times)} -- ${js(differnce_moneys)}`)
-
     difference_history = difference_history.filter(d=>(Date.now()-d.timestamp) < (ROLLING_TIME_SECONDS*1000) ) 
+    let difference_by_age: number[] = []
+    for ( let diff of difference_history ){
+      let age_in_seconds = ((Date.now() - diff.timestamp)/1000)
+      age_in_seconds = age_in_seconds?age_in_seconds:1
 
-    let cumulative_money_difference_over_history = difference_history.map(d=>d.diff).reduce((p,c)=>p + c)
-    let cumlative_money_difference = cumulative_money_difference_over_history 
-    //p(`cumlative money differnce: ${cumlative_money_difference}`)
-    let average_money_difference_per_period = cumlative_money_difference / (ROLLING_TIME_SECONDS)
-
-    //p( `average_difference: ${average_difference}`)
-    //p( `Difference History: ${JSON.stringify(difference_history.map(d=>d.diff).map(d=>d.toFixed(3)))}`)
+      let diff_by_age    = (diff.diff / age_in_seconds)
+      // ns.print( `age_in_seconds: ${age_in_seconds} diff_by_age: ${diff_by_age}`)
+      difference_by_age.push( diff_by_age )
+    }
+    // ns.print( `diff_by_age: ${difference_by_age}` ) 
+    let cumlative_diff_per_rolling_time = difference_by_age.reduce((p,c)=>p + c) 
+    let hacking = player.skills.hacking
+    
     p( `Money   : ${ns.formatNumber(player.money)}`)
-    p( `Money/s : ${ns.formatNumber(average_money_difference_per_period,1)}/${ROLLING_TIME_SECONDS}s ${NaN?`(NaN)`:``} ${printDot(ns,dot_info)}`)
+    p( `Money/s : ${ns.formatNumber(cumlative_diff_per_rolling_time,1)}/${ROLLING_TIME_SECONDS}s ${NaN?`(NaN)`:``} ${printDot(ns,dot_info)}`)
     p( `Karma   : ${player.numPeopleKilled *3}/54000` ) 
+    p( `Hacking : ${hacking}` )
 
-    await ns.asleep( 1000 )
+    await ns.asleep( 2000 )
   }//while(true)
 
   // FUNCTIONS
