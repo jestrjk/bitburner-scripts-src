@@ -15,10 +15,19 @@ export interface ServerAnalysisData {
 export interface ServerAnalysis {
   [key:string]: ServerAnalysisData
 }
+
+export interface ServerDiff {
+  hostname: string
+  diff_summary: string
+  time_to_live: number
+  timestamp: number
+}
+
 export interface GlobalData {
   server_list: ServerList
   server_analysis: ServerAnalysis 
   player: Player
+  server_diffs: ServerDiff[]
   singularity: {
     current_server: string
   }
@@ -44,7 +53,5 @@ export class DataBroker {
   }
 }
 
-export const data:Partial<GlobalData> = {
-  
-}
+export const data:Partial<GlobalData> = { }
 

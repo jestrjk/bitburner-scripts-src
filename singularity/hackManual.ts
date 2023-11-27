@@ -86,8 +86,17 @@ function pickBestToHack( ns:NS, target_servers:Server[] ): HackTarget {
 }
 
 function calculateRatio(ns:NS, server:HackTarget ):number {
-  server.ratio = (( server.hacking_money_ratio * server.money_available * server.hack_success_chance) 
+  let x = server.hack_success_chance
+  let a = ( 2*x ) - ( .85*Math.E*x ) + 1
+  let b = -( Math.log(.034)*x ) - 1.78
+  let scaled_success = -(a-b)
+
+  if ( server.money_available < 10000 ) return -5
+
+  server.ratio = (( server.hacking_money_ratio * server.money_available * scaled_success) 
     / (server.hack_time?server.hack_time:1) ) 
+
+  ns.tprint( `${server.server.hostname.padEnd( 24 )} success:${server.hack_success_chance.toFixed(3).padEnd( 20 )} scaled:${scaled_success.toFixed(3).padEnd(20)} ratio:${server.ratio.toFixed(3).padEnd(20)}`)
 
   return server.ratio
 }
@@ -112,9 +121,9 @@ function getHackTarget(ns:NS, player:Player, target_server:Server):HackTarget {
     hack_success_chance:  hack_target_success_chance,
   }
     
-  if ( hack_target_success_chance < .5 ) {
-    return hackTarget
-  } 
+  // if ( hack_target_success_chance < .6 ) {
+  //   return hackTarget
+  // } 
   
   calculateRatio( ns, hackTarget )
 

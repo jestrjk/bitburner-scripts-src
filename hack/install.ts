@@ -18,7 +18,7 @@ let broker = new DataBroker()
 
 export async function main(ns:NS) {
 	ns.tail()
-	ns.moveTail( 250, 0 )
+	ns.moveTail( 200, 0 )
 	ns.resizeTail( 450, 300)
 	
 	disableNSFunctionLogging(ns)

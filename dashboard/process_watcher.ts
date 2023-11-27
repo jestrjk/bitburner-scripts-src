@@ -1,5 +1,6 @@
 /* eslint-disable */
 import {NS, ProcessInfo, Server} from "../NetscriptDefinitions"
+import { DataBroker } from "../global_data/data"
 import {ServerList} from "../lib/ServerList"
 import { disableNSFunctionLogging } from "../lib/utils"
 
@@ -18,8 +19,10 @@ interface CustomProcessInfo extends ProcessInfo {
 }
 
 export async function main ( ns: NS ) {
+  let broker = new DataBroker()
+
   ns.tail() 
-  ns.moveTail( 700, 0)
+  ns.moveTail( 650, 0)
   ns.resizeTail( 750, 500)
 
   disableNSFunctionLogging(ns)
@@ -81,6 +84,9 @@ export async function main ( ns: NS ) {
         `${trm}:${trs}` */
         `${cdm}:${cds}`
       )
+
+    
+      
     }
     ns.print( `Hosting RAM: ${ns.formatNumber(script_host_ram,1)}/${ns.formatNumber(script_host_max_ram,1)}`)
   }
@@ -114,6 +120,13 @@ export async function main ( ns: NS ) {
           time_required_seconds,
           time_required_minutes,
           script_host_name,
+        })
+
+        broker.data.server_diffs.push( {
+          hostname: target_server_name,
+          diff_summary: proc.filename.split('/')[1],
+          time_to_live: time_required,
+          timestamp: Date.now(),
         })
       }
     }
