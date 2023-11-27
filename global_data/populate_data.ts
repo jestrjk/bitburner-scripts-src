@@ -4,6 +4,7 @@ import { data } from "./data"
 
 export async function main (ns:NS) {
   ns.tail() 
+  ns.moveTail(1200, 990)
   ns.disableLog( "scan")
 
   data.server_diffs = []
@@ -31,7 +32,7 @@ export async function main (ns:NS) {
 
     cleanServerDiffs(ns)    
 
-    await ns.sleep(2000)
+    await ns.sleep(500)
   }
 }
 

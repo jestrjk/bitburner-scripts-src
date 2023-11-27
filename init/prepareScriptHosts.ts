@@ -5,6 +5,7 @@ import { colors } from "../lib/utils";
 
 export async function main(ns:NS) {
   ns.tail() 
+  ns.moveTail(1700, 990)
   ns.disableLog( "scp" )
   ns.disableLog( "brutessh")
   ns.disableLog( "ftpcrack")
