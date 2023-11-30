@@ -1,7 +1,10 @@
-import {NS,Player,Server} from "../NetscriptDefinitions"
+import {NS,Player,Server,ScriptArg} from "../NetscriptDefinitions"
 import { ServerPath } from "../lib/ServerPath"
-import { ServerList } from "../lib/ServerList"
+import * as Flags from "../types/Flags"
 import { DataBroker } from "../global_data/data"
+
+export type OptionsSchema   = [string, string | number | boolean | string[]][] 
+export type FlagsResult     = { [key: string]: ScriptArg | string[] }
 
 interface NetworkNode {
   node_name: string
@@ -18,57 +21,82 @@ interface HackTarget {
   hack_time: number
 }
 
+type AlgorithmIterator = {value: 0}
+
+interface PickBestToHackParams  {
+  non_purchased_servers_with_money: Server[]
+  last_hack_target_hostname: string
+  linear_select_algorithim_iterator: AlgorithmIterator
+  options: FlagsResult
+}
+
+let optionSchema:Flags.OptionsSchema = [['disable_best_select_algorithm', false],]
 let broker = new DataBroker()
 
 export async function main(ns:NS) {
   ns.tail()
   ns.moveTail(1450, 610)
   ns.resizeTail( 1050, 200)
-
-  //ns.disableLog( "sleep")
-  //ns.disableLog( "scan")
   ns.disableLog( "scan" )
 
+  let options = ns.flags(optionSchema)
+
+  let linear_select_algorithim_iterator:AlgorithmIterator = { value: 0 } // Iterator used when best select algorithm is disabled
+
+  let last_hack_target_hostname:string = ''
   while ( true ) {
     
     let non_purchased_servers_with_money = broker.all_servers.filter(s=>!s.purchasedByPlayer&&(s.moneyMax??0) > 0)
-  
-    let best_to_hack:HackTarget  = pickBestToHack(ns, non_purchased_servers_with_money)
-    let bth = best_to_hack
     
-    let print_version = {
-      name:             bth.server?.hostname,
-      ratio:            bth.ratio.toFixed(2),
-      money_available:  ns.formatNumber(bth.server.moneyAvailable??0),
-      hacking_money:    ns.formatNumber(bth.hacking_money_ratio),
-      max_money:        ns.formatNumber(bth.server.moneyMax??0),
-      hacking_chance:   bth.hack_success_chance.toFixed(2),
-      hacking_time:     `${Math.floor((bth.hack_time/1000))}s`,
-    }
-    //ns.print( JSON.stringify( print_version, null, 1 ) )
-  
-    let server_path = new ServerPath(ns,broker.data.singularity.current_server, bth.server.hostname )
+    let best_to_hack_hostname:string  = pickBestToHack(ns, {
+      last_hack_target_hostname,
+      linear_select_algorithim_iterator,
+      non_purchased_servers_with_money,
+      options,
+    })
+
+    last_hack_target_hostname= best_to_hack_hostname
+       
+    let server_path = new ServerPath(ns,broker.data.singularity.current_server, best_to_hack_hostname )
     server_path.goToTarget()
 
     await ns.singularity.manualHack()
-    
   }
 }
 
-function pickBestToHack( ns:NS, target_servers:Server[] ): HackTarget {
+function pickBestToHack( ns:NS, params: PickBestToHackParams ): string {
+
+  // best_hack_algorithm DISABLED
+  if ( params.options.disable_best_select_algorithm ) {
+    if ( params.linear_select_algorithim_iterator.value >= params.non_purchased_servers_with_money.length ) 
+    { params.linear_select_algorithim_iterator.value = 0 }
+
+    let simple_iterated_hostname:string = params.non_purchased_servers_with_money[params.linear_select_algorithim_iterator.value].hostname
+
+    params.linear_select_algorithim_iterator.value ++
+
+    return simple_iterated_hostname
+  }
+
+  // best_hack_algorithm ENABLED
   let player = broker.data.player
   let best_hack_target:HackTarget = {
     player: player,
     hacking_money_ratio: 0,
     money_available: 0,
-    server: target_servers[0],
+    server: params.non_purchased_servers_with_money[0],
     ratio: 0,
     hack_success_chance: 0,
     hack_time: 1,
   }
-
-  for( let current_target_server of target_servers) {
+  
+  for( let current_target_server of params.non_purchased_servers_with_money) {
     if ( !current_target_server.hasAdminRights ) continue
+
+    if ( params.last_hack_target_hostname === current_target_server.hostname ) {
+      ns.print( `Skipping last hack target: ${params.last_hack_target_hostname}==${current_target_server.hostname}` )
+      continue
+    }
     
     let current_hack_target = getHackTarget(ns, player,current_target_server )
 
@@ -82,7 +110,8 @@ function pickBestToHack( ns:NS, target_servers:Server[] ): HackTarget {
       best_hack_target = current_hack_target
     }
   }
-  return best_hack_target
+  
+  return best_hack_target.server.hostname
 }
 
 function calculateRatio(ns:NS, server:HackTarget ):number {
@@ -129,10 +158,7 @@ function getHackTarget(ns:NS, player:Player, target_server:Server):HackTarget {
 }
 
 export function autocomplete(data:any, args:any) {
-  let results = []
-  if ( data.servers ) results.push( ...data.servers )
-  if ( data.scripts ) results.push( ...data.scripts )
-
-  return results
+  data.flags(optionSchema)
+  return [data.flags]
 }
 

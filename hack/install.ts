@@ -1,7 +1,13 @@
 /* eslint-disable */
-import {NS, Server} from "../NetscriptDefinitions"
+import {NS, Server, AutocompleteData } from "../NetscriptDefinitions"
 import {colors, disableNSFunctionLogging} from "../lib/utils"
 import { DataBroker } from "../global_data/data"
+
+let optionsSchema:any = [
+	['hack_per_server_limit', 1],
+	['disable_hack_calls', false],
+	['help', false],
+]
 
 let hack_script_names = {
 	weaken: "hack/weaken.js",
@@ -23,11 +29,17 @@ export async function main(ns:NS) {
 	
 	disableNSFunctionLogging(ns)
 
-	await ns.sleep( 2000 )
+	let { options, optionsArgs, optionsTargets } = getOptions(ns)
+
+  ns.tprint(  options )
+	ns.tprint(  optionsArgs )
+
+	await ns.sleep( 1000 )
 	while ( true ) {
 
 		let { target_servers, all_servers }: { target_servers: Server[]; all_servers:Server[] } = getServerLists(broker)
-
+		if ( optionsTargets.length > 0 ) target_servers = target_servers.filter( s=> optionsTargets.includes( s.hostname ))
+		
 		ns.print( `target_servers: ${JSON.stringify( target_servers.map(s=>s.hostname))}`)
 
 		// Start da haxoring!
@@ -39,7 +51,6 @@ export async function main(ns:NS) {
 			if ( !target_server.hasAdminRights ) continue;
 			let target_max_money 			=	ns.getServerMaxMoney( target_server.hostname )
 			if ( target_max_money <= 0 ) continue ;
-
 
 			ns.print( `[${script_host.hostname}] ram ${script_host.maxRam-script_host.ramUsed}`)
 
@@ -62,9 +73,9 @@ export async function main(ns:NS) {
 			if ( target_current_security >= 10 + target_min_security ) {
 				let weaken_time 						= ns.getWeakenTime( target_server_name )
 				let weaken_amount 					= server_analysis.weakenAnalyseData
-				let weaken_threads 					= 100 ; 		// TODO TODO TODO Fix this to dynamic calc
+				let weaken_threads 					= 1000 ; 		// TODO TODO TODO Fix this to dynamic calc
 
-				exec_script( script_host, script_hosts, target_server_name, hack_script_names.weaken, weaken_threads, weaken_time  ) 
+				exec_script( script_host, script_hosts, target_server_name, hack_script_names.weaken, weaken_threads, weaken_time  )
 			} else { err( errOptions, "weaken()" ) }
 
 			if ( target_money < .8 * target_max_money ) {
@@ -72,50 +83,59 @@ export async function main(ns:NS) {
 				let grow_time 							= server_analysis.grow_time_required
 				let growth_threads 					= server_analysis.growthAnalyzeData
 				
-				exec_script( script_host, script_hosts, target_server_name, hack_script_names.grow, growth_threads, grow_time ) 
+				exec_script( script_host, script_hosts, target_server_name, hack_script_names.grow, growth_threads, grow_time )
 			} else{ err( errOptions, "grow()" )}
 			
-			if ( target_money >= .8 * target_max_money ) {
-				let hack_time 			= ns.getHackTime( target_server_name )
-				let hack_threads   = Math.max( Math.floor( ns.hackAnalyzeThreads(target_server_name, Math.floor( target_max_money*.75 ))) , 1)
-				
-				exec_script( script_host, script_hosts, target_server_name, hack_script_names.hack, hack_threads, hack_time ) 
-			} else{ err( errOptions, `hack() money: ${ns.formatNumber(target_money,1)} / ${ns.formatNumber(target_max_money,1)} }`)}
-
+			if ( options.disable_hack_calls ) { 
+				ns.print( `Hack calls disabled` )
+			} else {
+				if ( target_money >= .8 * target_max_money ) {
+					let hack_time 			= ns.getHackTime( target_server_name )
+					let hack_threads   = Math.max( Math.floor( ns.hackAnalyzeThreads(target_server_name, Math.floor( target_max_money*.75 ))) , 1)
+					
+					exec_script( script_host, script_hosts, target_server_name, hack_script_names.hack, hack_threads, hack_time )
+				} else{ err( errOptions, `hack() money: ${ns.formatNumber(target_money,1)} / ${ns.formatNumber(target_max_money,1)} }`)}
+			}
+			
 			ns.print( `${colors.white}End script hosts`)
 		} // for target_servers 
 		ns.print(`${colors.white}End target servers `)
-		await ns.sleep ( 100 )
+		await ns.sleep ( 50 )
 	} // while true
 
 	// ------- Function Definitions -------
 	// function defs main->fn
 
-	
+	function numberOfSimliarScriptsRunning(script_name:string,target_server_name: string):number{
+		
+		let count_of_similar_scripts = 0 
+		for ( let other_script_host of broker.script_hosts ) {
+			//ns.print( `Checking if any hack scripts running on ${other_script_host.hostname}`)
+
+			if ( ns.scriptRunning( script_name, other_script_host.hostname )) {
+				ns.print( `Found scripts running on ${other_script_host.hostname}`)
+				let ps = ns.ps( other_script_host.hostname )
+				// ns.print( ps )
+				count_of_similar_scripts += ps.filter( proc=>(
+					proc.filename.startsWith( "hack" ) &&
+					proc.args.includes(target_server_name))
+				).length
+
+			}//for
+		}//for
+		return count_of_similar_scripts
+	} //function
+
 	function exec_script( script_host: Server, script_hosts: Server[], target_server_name: string, 
 		script_name: string, threads_required: number, time_required: number = -1 ):boolean	 {
 		
-			for ( let other_script_host of broker.script_hosts ) {
-				//ns.print( `Checking if any hack scripts running on ${other_script_host.hostname}`)
+		let scripts_running = numberOfSimliarScriptsRunning(script_name, target_server_name)
+		ns.print( `similar scripts running: ${scripts_running}`)
 
-				if ( ns.scriptRunning( script_name, other_script_host.hostname )) {
-					ns.print( `Found scripts running on ${other_script_host.hostname}`)
-					let ps = ns.ps( other_script_host.hostname )
-					// ns.print( ps )
-					for ( let proc of ps ) {
-						//ns.print( `Checking proc ${proc.filename} ${proc.args} on ${other_script_host.hostname}`)
-						if ( proc.filename.startsWith( "hack" )) {
-							if ( proc.args.includes(target_server_name) ) {
-								ns.print(`ERROR Found ${proc.filename} on ${other_script_host.hostname} with target ${proc.args[0]}`)
-								return false
-							}
-					}
-				}
-			}
-		}
+		if ( scripts_running > <number>options.hack_per_server_limit ) return false
 
-		let host_max_ram   			= ns.getServerMaxRam( script_host.hostname )
-		let adjusted_thread_count = adjustThreadCount( ns, script_host.hostname, host_max_ram, script_name, threads_required )
+		let host_max_ram   					= ns.getServerMaxRam( script_host.hostname )
+		let adjusted_thread_count 	= adjustThreadCount( ns, script_host.hostname, host_max_ram, script_name, threads_required )
 		if ( adjusted_thread_count < 1 ) {
 			err( {ns,target_server_name,script_host_name: script_host.hostname}, `host OOM: ${host_max_ram}`)
 			return false
@@ -130,6 +150,22 @@ export async function main(ns:NS) {
 
 	
 } // main
+
+function getOptions(ns: NS) {
+	let options:any = ns.flags(optionsSchema)
+
+	if (options.help) {
+		ns.tprint(optionsSchema)
+		ns.closeTail()
+		ns.exit()
+	}
+
+	let optionsArgs: string[] = [options._].flat()
+	let optionsTargets: string[] = []
+	if (optionsArgs.length > 0) optionsTargets = optionsArgs
+	
+	return { options, optionsArgs, optionsTargets }
+}
 
 function adjustThreadCount( ns: NS, script_host_name: string, host_max_ram: number, script_name: string, threads: number ) {
 
@@ -181,4 +217,9 @@ function getErrOptions(ns:NS, script_host: Server, target_server_name: string): 
 		script_host_name: script_host.hostname,
 		target_server_name
 	}
+}
+
+export function autocomplete(data:AutocompleteData, args:any) {
+	data.flags(optionsSchema)
+  return [ ...data.servers, ...data.scripts, data.flags ]
 }

@@ -32,7 +32,7 @@ export async function main (ns:NS) {
 
     cleanServerDiffs(ns)    
 
-    await ns.sleep(500)
+    await ns.sleep(250)
   }
 }
 

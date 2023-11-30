@@ -94,7 +94,7 @@ export async function main(ns : NS) {
 		}
 		printHeaders()
 
-		await ns.sleep( 1000 )
+		await ns.sleep( 200 )
 	}	// while(true)
 
 	function map_server_data(target_server: Server) : Server_Info_Extended {

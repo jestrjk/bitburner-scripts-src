@@ -44,7 +44,7 @@ export async function main ( ns: NS ) {
 
     printExtendedProcessData(filtered_proc_data, script_host_ram_info.script_host_ram, script_host_ram_info.script_host_max_ram )
 
-    await ns.sleep( 1000 )
+    await ns.sleep( 500 )
   }
 
   function getTotalRamUsedAvailable(hacked_servers: Server[]) {

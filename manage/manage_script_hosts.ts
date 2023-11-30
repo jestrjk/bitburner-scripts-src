@@ -11,7 +11,7 @@ export async function main ( ns: NS ) {
   let base_ram = 1
   let server_sizes: number[] = []
 
-  for ( let i = 0 ; i < 10; i++ ) {
+  for ( let i = 0 ; i < 21; i++ ) {
     server_sizes.push( base_ram *= 2 )
   }
 
@@ -58,6 +58,7 @@ export async function main ( ns: NS ) {
         break ;
 
       case Commands.exit:
+        ns.closeTail()
         ns.exit() ;
       default: 
         ns.print( `ERROR: not a valid command: ${choice}`)
