@@ -1,6 +1,6 @@
 import { NS } from "../NetscriptDefinitions";
 import { ServerList } from "../lib/ServerList";
-import { data } from "./data"
+import { DataBroker, data } from "./data"
 
 export async function main (ns:NS) {
   ns.tail() 
@@ -14,8 +14,7 @@ export async function main (ns:NS) {
 
     data.player = ns.getPlayer(),
     data.server_list = new ServerList(ns)
-    data.server_analysis = {}
-    data.singularity = { current_server: ns.singularity.getCurrentServer() }
+    data.singularity!.current_server = ns.singularity.getCurrentServer()
 
     for( let server of data.server_list.all_servers) {
       data.server_analysis![server.hostname] = {
@@ -32,7 +31,9 @@ export async function main (ns:NS) {
 
     cleanServerDiffs(ns)    
 
-    await ns.sleep(250)
+    data.singularity!.current_actions = data.singularity!.current_actions.filter( ca => ca.ttl > Date.now() )
+
+    await ns.sleep(500)
   }
 }
 

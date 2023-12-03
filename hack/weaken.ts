@@ -6,13 +6,12 @@ export async function main(ns: NS) {
    try {
     let target  = ns.args[0] as string
 
-    let broker = new DataBroker()
-    broker.data.server_diffs.push(  {
-      timestamp: Date.now(),
-      hostname: target,
-      diff_summary: "weaken",
-      diff_explanation: `weaken ${target}`
-    })
+    // let broker = new DataBroker()
+    // broker.data.server_diffs.push(  {
+    //   timestamp: Date.now(),
+    //   hostname: target,
+    //   diff_summary: "weaken",
+    // })
 
     let weaken_result = await ns.weaken( target )
     

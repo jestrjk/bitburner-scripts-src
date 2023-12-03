@@ -71,11 +71,20 @@ export async function main(ns : NS) {
 					if ( diff_display.includes( diff_display_string) ) continue
 					diff_display += diff_display_string
 				}
-				// ns.tprint( diff_display )
-				// await ns.sleep( 3000 )
+			}
+			
+			let singularity_action = false
+			//ns.tprint( broker.data.singularity.current_actions )
+			
+			for ( let action of broker.data.singularity.current_actions ){
+				if ( action.target_hostname === server.hostname) {
+					diff_display += action.action
+					singularity_action = true
+				}
 			}
 
 			if ( diff_display.length > 0 ) { line_color = colors.magenta }
+			if ( singularity_action ) { line_color = colors.yellow } 
 			
 			ns.print ( 
 				`${line_color}` + 

@@ -23,6 +23,13 @@ export interface ServerDiff {
   timestamp: number
 }
 
+export interface SingularityAction {
+  pid:              number
+  target_hostname:  string
+  action:           string
+  ttl:              number
+}
+
 export interface GlobalData {
   server_list: ServerList
   server_analysis: ServerAnalysis 
@@ -30,7 +37,9 @@ export interface GlobalData {
   server_diffs: ServerDiff[]
   singularity: {
     current_server: string
+    current_actions: SingularityAction[]
   }
+
 }
 
 export class DataBroker {
@@ -53,5 +62,12 @@ export class DataBroker {
   }
 }
 
-export const data:Partial<GlobalData> = { }
+export const data:Partial<GlobalData> = {
+  singularity: {
+    current_server: "home",
+    current_actions: [],
+  },
+  server_diffs: [],
+  server_analysis: {},
+}
 

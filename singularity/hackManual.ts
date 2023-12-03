@@ -39,9 +39,12 @@ export async function main(ns:NS) {
   ns.resizeTail( 1050, 200)
   ns.disableLog( "scan" )
 
+  broker.data.singularity.current_actions = broker.data.singularity.current_actions.filter(a=> ns.pid )
+
   let options = ns.flags(optionSchema)
 
   let linear_select_algorithim_iterator:AlgorithmIterator = { value: 0 } // Iterator used when best select algorithm is disabled
+  
 
   let last_hack_target_hostname:string = ''
   while ( true ) {
@@ -59,8 +62,19 @@ export async function main(ns:NS) {
        
     let server_path = new ServerPath(ns,broker.data.singularity.current_server, best_to_hack_hostname )
     server_path.goToTarget()
+    
+    let ttl = Date.now() + Date.now() + 5 * 1000 * 60 
+    let new_action = { 
+      pid: ns.pid, 
+      target_hostname: 
+      best_to_hack_hostname, 
+      action: "SH",
+      ttl,
+     }
 
+    broker.data.singularity.current_actions.push(new_action)
     await ns.singularity.manualHack()
+    broker.data.singularity.current_actions = broker.data.singularity.current_actions.filter(a=> a.pid != new_action.pid)
   }
 }
 

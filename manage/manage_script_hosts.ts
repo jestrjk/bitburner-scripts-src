@@ -11,7 +11,7 @@ export async function main ( ns: NS ) {
   let base_ram = 1
   let server_sizes: number[] = []
 
-  for ( let i = 0 ; i < 21; i++ ) {
+  for ( let i = 0 ; i < 20; i++ ) {
     server_sizes.push( base_ram *= 2 )
   }
 
