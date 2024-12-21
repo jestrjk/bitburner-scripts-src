@@ -1,0 +1,6 @@
+
+right now seems to be focusing on mirroring /dist.
+
+need to get that pointed at a src, and no longer transpile or compile
+the ts to js, since bitburner can natively do ts now.
+
