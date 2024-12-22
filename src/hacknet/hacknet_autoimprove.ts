@@ -1,4 +1,6 @@
-import {NS} from "./NetscriptDefinitions"
+// import {NS} from "./NetscriptDefinitions"
+
+// Something wicked
 
 interface HacknetNodeInformation {
   index:number
