@@ -1,4 +1,3 @@
-import {NS} from "../../../NetscriptDefinitions"
 import { ServerPath } from "../lib/ServerPath"
 
 interface ScriptEntry {
@@ -28,28 +27,32 @@ export async function main(ns:NS) {
   }
   ns.tprint( `hackmanual ratio ${script_host_maxram_ratio_desired}`)
 
-  let singularity_hack_manual_script_name = "singularity/hackManual.js"
+  let singularity_hack_manual_script_name = "/scripts/singularity/hackManual.ts"
 
   let hack_manual_threads = setupSingularityManualHackThreads(ns, singularity_hack_manual_script_name, script_host_maxram_ratio_desired)
   ns.tprint ( `hack manual threads : ${hack_manual_threads}`)
 
   //if ( hack_manual_threads !== 0 ) hack_manual_threads = <number>ns.args[0] 
   
+  let rootDir = "/scripts" 
+
   let pre_scripts:ScriptEntry[] = [
-    { name: "global_data/populate_data.js", threads: 1 },
-    { name: "init/prepareScriptHosts.js",   threads: 1 },
+    { name: "global_data/populate_data.ts", threads: 1 },
+    { name: "init/prepareScriptHosts.ts",   threads: 1 },
   ]
 
   let scripts:ScriptEntry[] = [
-    { name: "dashboard/server_stats.js",    threads: 1 },
-    { name: "dashboard/process_watcher.js", threads: 1 },
-    { name: "dashboard/money_perSecond.js", threads: 1 },
+    { name: "dashboard/server_stats.ts",    threads: 1 },
+    { name: "dashboard/process_watcher.ts", threads: 1 },
+    { name: "dashboard/money_perSecond.ts", threads: 1 },
     
-    { name: "singularity/hackManual.js", args: ["--disable_best_select_algorithm"],   threads: 1500, nokill:true },
-    { name: "singularity/hackManual.js",                                              threads: 2500, nokill:true },
-    { name: "hack/install.js", args:["--disable_hack_calls", "--hack_per_server_limit", "10"],                   threads: 1 },
+    { name: "singularity/hackManual.ts", args: ["--disable_best_select_algorithm"],   threads: 1500, nokill:true },
+    { name: "singularity/hackManual.ts",                                              threads: 2500, nokill:true },
+    { name: "hack/install.ts", args:["--disable_hack_calls", "--hack_per_server_limit", "10"],                   threads: 1 },
   ]
-  
+ 
+  pre_scripts = pre_scripts.map(  script => { script.name = `${rootDir}/${script.name}`; return script } )
+  scripts     = scripts.map    (  script => { script.name = `${rootDir}/${script.name}`; return script } )
 
   await killOldAndRunNewScripts(ns, pre_scripts)
   await ns.sleep( 2000 )
@@ -83,7 +86,7 @@ async function killOldAndRunNewScripts(ns: NS, scripts: ScriptEntry[]) {
         ns.kill(filtered_proc.pid)
       }
     }
-    ns.tprint( `Running ${script.name} ${script.args??''} ${script.threads} nokill:${script.nokill}`)
+    ns.print( `Running ${script.name} ${script.args??''} ${script.threads} nokill:${script.nokill}`)
     ns.run(script.name, script.threads, ...script.args??[] )
     await ns.sleep(1000)
   }

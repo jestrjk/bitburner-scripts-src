@@ -12,7 +12,6 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "strict": true,
-    "rootDir": "scripts/",
     "outDir": "dist/",
     "baseUrl": "scripts/",
     "allowJs": true,

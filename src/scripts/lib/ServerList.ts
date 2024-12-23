@@ -1,6 +1,4 @@
 /* eslint-disable */
-import { NS, Server } from '../../../NetscriptDefinitions'
-
 export class ServerList {
   constructor(ns:NS){
     this.ns = ns

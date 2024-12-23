@@ -1,4 +1,3 @@
-import { NS } from "../../../NetscriptDefinitions";
 import { DataBroker } from "../global_data/data";
 import * as FlagTypes from "../types/Flags"
 

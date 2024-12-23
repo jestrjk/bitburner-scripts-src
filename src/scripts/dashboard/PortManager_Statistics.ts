@@ -1,4 +1,3 @@
-import {NS} from "../../../NetscriptDefinitions"
 import * as PM  from "../lib/PortManager"
 
 export async function main(ns:NS) {

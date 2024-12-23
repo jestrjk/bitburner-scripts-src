@@ -1,6 +1,3 @@
-/* eslint-disable */
-import { NS } from "../../../NetscriptDefinitions";
-
 //                MAIN
 export async function main ( ns:NS ) {
   ns.tail()

@@ -1,4 +1,3 @@
-import { Player, Server } from "../../../NetscriptDefinitions"
 import { ServerList } from "../lib/ServerList"
 
 export interface ServerAnalysisData {

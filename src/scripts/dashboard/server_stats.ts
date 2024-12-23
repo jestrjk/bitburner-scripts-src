@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { NS, Server } from '../../../NetscriptDefinitions'
 import * as lib_args from '../lib/argumentProcessor'
 import { colors, toMillionsFormatted } from '../lib/utils'
 import { ServerList } from '../lib/ServerList'
@@ -102,6 +101,7 @@ export async function main(ns : NS) {
 			)
 		}
 		printHeaders()
+		ns.print( Date.now())
 
 		await ns.sleep( 200 )
 	}	// while(true)

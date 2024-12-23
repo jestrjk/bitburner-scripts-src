@@ -1,6 +1,3 @@
-/* eslint-disable */
-import {NS, PortData} from "../../../NetscriptDefinitions"
-
 /**
 * converts an amount to decimal percentage, ie
 * 0%   = 0 
@@ -43,34 +40,6 @@ export const colors = {
   reset:          '\u001b[0m'
 };
 
-export async function testPort( ns:NS, data: any ) {
-  
-  ns.writePort(1, JSON.stringify( data ) )
-  ns.print( `wrote data to port 1` )
-  await ns.sleep( 1000 ) 
-
-  let peek_data = ns.peek(1)
-  ns.print( `Peeked:` )
-  ns.print( JSON.parse( peek_data.toString() ) )
-  await ns.sleep( 1000 )
-
-  let read_data = ns.readPort( 1 ) 
-  ns.print( `read data`)
-  ns.print( JSON.parse ( read_data.toString() ) )
-
-  ns.clearPort( 1 )
-  let count = 0
-  let results: PortData | null 
-  while ( ( results = ns.writePort( 1, 'asdfghjk' )) == null ) {
-    count ++
-  }
-  
-  ns.print( `Wrote 'asdfghjk' ${count} times. ~${count*8}B`)
-}
-
-export function printUsage(schema:any[]) {
-
-}
 export function disableNSFunctionLogging(ns:NS) {
   ns.disableLog( 'sleep' )  
   ns.disableLog( 'asleep' )  

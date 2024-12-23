@@ -1,5 +1,4 @@
 /* eslint-disable */
-import {NS, ProcessInfo, Server} from "../../../NetscriptDefinitions"
 import { DataBroker } from "../global_data/data"
 import {ServerList} from "../lib/ServerList"
 import { disableNSFunctionLogging } from "../lib/utils"
@@ -31,7 +30,6 @@ export async function main ( ns: NS ) {
   while ( true ) {
     let server_lists          = new ServerList(ns)
 
-    
     let hacked_servers:Server[] = server_lists.all_servers.filter( s=>s.hasAdminRights )
 
     let script_host_ram_info = getTotalRamUsedAvailable(hacked_servers)

@@ -1,4 +1,3 @@
-import { NS, Server } from "../../../NetscriptDefinitions";
 import { ServerList } from "../lib/ServerList";
 import { RootKit } from "../lib/RooKit";
 import { colors } from "../lib/utils";

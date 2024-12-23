@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { colors } from "./utils"
-import {NS, Server} from "../../../NetscriptDefinitions"
 
 export class RootKit {
   ns: NS

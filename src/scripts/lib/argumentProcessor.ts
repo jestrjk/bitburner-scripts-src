@@ -1,5 +1,4 @@
 /* eslint-disable */
-import {NS} from "../../../NetscriptDefinitions"
 
 interface Arguments {
 	options: { [key: string]: string }

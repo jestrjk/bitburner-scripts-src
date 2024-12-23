@@ -1,5 +1,4 @@
 /* eslint-disable */
-import {NS, Server, AutocompleteData } from "../../../NetscriptDefinitions"
 import {colors, disableNSFunctionLogging} from "../lib/utils"
 import { DataBroker } from "../global_data/data"
 

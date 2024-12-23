@@ -1,4 +1,3 @@
-import { NS } from "../../../NetscriptDefinitions";
 import { ServerList } from "../lib/ServerList";
 import { DataBroker, data } from "./data"
 

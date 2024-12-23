@@ -1,5 +1,3 @@
-import {NS, Server} from "../../../NetscriptDefinitions"
-
 export class ServerPath {
   constructor(ns:NS,start_node_name:string, target_node_name: string) {
     this._ns = ns

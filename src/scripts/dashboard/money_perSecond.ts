@@ -1,4 +1,3 @@
-import {NS} from "../../../NetscriptDefinitions"
 
 interface DotInfo {
   dots: string[]

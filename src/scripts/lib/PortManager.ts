@@ -1,5 +1,3 @@
-import {NS, PortData} from "../../../NetscriptDefinitions"
-
 export interface PortMonitorStats extends CalculatedPortMonitorStats {
   peeks:number
   reads:number

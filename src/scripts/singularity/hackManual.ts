@@ -1,4 +1,3 @@
-import {NS,Player,Server,ScriptArg} from "../../../NetscriptDefinitions"
 import { ServerPath } from "../lib/ServerPath"
 import * as Flags from "../types/Flags"
 import { DataBroker } from "../global_data/data"
@@ -38,6 +37,8 @@ export async function main(ns:NS) {
   ns.moveTail(1450, 610)
   ns.resizeTail( 1050, 200)
   ns.disableLog( "scan" )
+
+  ns.print( "hackManual" )
 
   broker.data.singularity.current_actions = broker.data.singularity.current_actions.filter(a=> ns.pid )
 
