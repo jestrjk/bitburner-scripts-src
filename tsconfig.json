@@ -1,6 +1,7 @@
 {
-  "include": ["NetscriptDefinitions.d.ts", "src/**/*"],
-  "exclude": ["src/lib/react.ts"],
+  "include": ["NetscriptDefinitions.d.ts", "src/**/*", "test.ts" , "global.d.ts"],
+  "exclude": ["scripts/lib/react.ts"],
+  "global" : ["global"],
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
@@ -11,9 +12,9 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "strict": true,
-    "rootDir": "src/",
+    "rootDir": "scripts/",
     "outDir": "dist/",
-    "baseUrl": "src/",
+    "baseUrl": "scripts/",
     "allowJs": true,
     "jsx": "react",
     "paths": {
