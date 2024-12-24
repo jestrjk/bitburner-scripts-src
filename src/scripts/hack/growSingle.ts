@@ -1,4 +1,3 @@
-import { NS } from "../../../NetscriptDefinitions";
 
 let optionsSchema:any = [["target", ["megacorp"]]]
 

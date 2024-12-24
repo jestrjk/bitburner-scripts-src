@@ -58,7 +58,7 @@ export async function main(ns:NS) {
   await ns.sleep( 2000 )
   await killOldAndRunNewScripts(ns, scripts)
   await ns.sleep( 2000 ) 
-  ns.closeTail()
+  //ns.closeTail()
 }
 
 function setupSingularityManualHackThreads(ns: NS, singularity_hack_manual_script_name: string, script_host_maxram_ratio_desired: number) {

@@ -7,4 +7,6 @@ declare global {
   type ScriptArg = NetDef.ScriptArg
   type ProcessInfo = NetDef.ProcessInfo
   type AutocompleteData = NetDef.AutocompleteData 
+  type RunningScript = NetDef.RunningScript
+  type ServerAnalysisData = NetDef.ServerAnalysisData
 }

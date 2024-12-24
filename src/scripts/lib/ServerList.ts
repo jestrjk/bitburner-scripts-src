@@ -22,7 +22,7 @@ export class ServerList {
   }
 
   private buildScriptHosts() {
-    this.script_hosts = this.all_servers.filter((s=>s.purchasedByPlayer && !s.hostname.startsWith( "utility-scripts")))
+    this.script_hosts = this.all_servers.filter(s=>s.purchasedByPlayer )
   }
 
   private recursiveServerScan(parent_host_name = 'home'): void {

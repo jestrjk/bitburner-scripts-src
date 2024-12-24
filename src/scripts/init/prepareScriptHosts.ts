@@ -26,7 +26,7 @@ export async function main(ns:NS) {
 
 function installScripts( ns: NS,script_host: Server ) {
   if ( script_host.hasAdminRights) {
-    let script_names_to_scp = ns.ls('home', ".js")
+    let script_names_to_scp = ns.ls('home', ".ts")
     if ( ns.scp( script_names_to_scp, script_host.hostname, 'home' ) ) {
       ns.print(`${colors.brightGreen}Success SCP ${script_host.hostname}`) 
     } else {

@@ -1,4 +1,13 @@
 
+Dec-24-2024
+
+Implemented new hackable server. Problems include memory bloat, too many functions on >100 thread scripts (auto / hackableserver.ts)
+
+Need to split weaken and hack/grow into two separate scripts, so that we divide up some of the memory bloat, and also
+allow weaken to be more intelligent. Right now its downright stupid.
+
+
+Dec-20 2024
 right now seems to be focusing on mirroring /dist.
 
 need to get that pointed at a src, and no longer transpile or compile

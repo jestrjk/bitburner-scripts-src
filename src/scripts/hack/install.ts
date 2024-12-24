@@ -72,7 +72,7 @@ export async function main(ns:NS) {
 			if ( target_current_security >= 10 + target_min_security ) {
 				let weaken_time 						= ns.getWeakenTime( target_server_name )
 				let weaken_amount 					= server_analysis.weakenAnalyseData
-				let weaken_threads 					= 1000 ; 		// TODO TODO TODO Fix this to dynamic calc
+				let weaken_threads 					= 100 ; 		// TODO TODO TODO Fix this to dynamic calc
 
 				exec_script( script_host, script_hosts, target_server_name, hack_script_names.weaken, weaken_threads, weaken_time  )
 			} else { err( errOptions, "weaken()" ) }
@@ -99,7 +99,8 @@ export async function main(ns:NS) {
 			ns.print( `${colors.white}End script hosts`)
 		} // for target_servers 
 		ns.print(`${colors.white}End target servers `)
-		await ns.sleep ( 50 )
+		ns.print( Date.now() )
+		await ns.sleep ( 1000 )
 	} // while true
 
 	// ------- Function Definitions -------
@@ -142,7 +143,7 @@ export async function main(ns:NS) {
 
 		adjusted_thread_count = Math.floor( adjusted_thread_count )
 
-		ns.print( `WARNING EXEC ${script_host.hostname}=>${target_server_name} with ${script_name}(t=${adjusted_thread_count})`)
+		ns.print( `WARNING EXEC [${script_host.hostname}]=>${target_server_name} with ${script_name}(t=${adjusted_thread_count})`)
 		ns.exec(script_name, script_host.hostname, adjusted_thread_count, target_server_name, Date.now(), time_required )
 		return true ;
 	}

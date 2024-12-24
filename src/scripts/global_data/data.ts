@@ -63,7 +63,7 @@ export class DataBroker {
 
 export const data:Partial<GlobalData> = {
   singularity: {
-    current_server: "home",
+    current_server: "home", // TODO: This is a motherfucking assumption. Wtf.
     current_actions: [],
   },
   server_diffs: [],

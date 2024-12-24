@@ -1,5 +1,4 @@
 /* eslint-disable */
-import {NS} from "../../../NetscriptDefinitions"
 import * as PM from "../lib/PortManager"
 import { DataBroker } from "../global_data/data"
 
