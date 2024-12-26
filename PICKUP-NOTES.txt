@@ -1,4 +1,11 @@
 
+Dec=26-2024
+
+Started hack/controller.ts
+
+Needs to select weaken threads properly
+needs to implement grow and hack
+
 Dec-24-2024
 
 Implemented new hackable server. Problems include memory bloat, too many functions on >100 thread scripts (auto / hackableserver.ts)

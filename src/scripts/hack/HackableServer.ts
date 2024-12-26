@@ -85,7 +85,12 @@ export class HackableServer {
       time_to_live: this.ns.getWeakenTime(this.name ),
     })
 
-    await this.ns.weaken( this.name, { threads: this.running_process.threads } )
+    return await this.ns.weaken( this.name, { threads: this.running_process.threads } )
   }
+
+  public hasRootAccess() {
+    return this.ns.hasRootAccess(this.name) ;
+  }
+ 
   
 }

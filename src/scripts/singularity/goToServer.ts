@@ -1,4 +1,3 @@
-import { NS } from "../../../NetscriptDefinitions";
 import { ServerPath} from "../lib/ServerPath";
 
 export async function main(ns:NS) {

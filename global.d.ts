@@ -8,5 +8,4 @@ declare global {
   type ProcessInfo = NetDef.ProcessInfo
   type AutocompleteData = NetDef.AutocompleteData 
   type RunningScript = NetDef.RunningScript
-  type ServerAnalysisData = NetDef.ServerAnalysisData
 }
