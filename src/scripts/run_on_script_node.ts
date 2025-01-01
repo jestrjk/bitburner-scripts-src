@@ -1,5 +1,5 @@
 import {NS} from "../../NetscriptDefinitions";
-import {ServerList} from "./lib/ServerList";
+import {ServerList} from "./global_data/ServerTargetList";
 
 export function autocomplete(data:any, args:any) {
   //return [...data.servers]; // This script autocompletes the list of servers.

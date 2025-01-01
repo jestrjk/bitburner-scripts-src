@@ -1,5 +1,5 @@
-import { DataBroker } from "../global_data/data";
-import { ServerAnalysisData } from "../global_data/data";
+import { DataBroker } from "../global_data/GlobalData";
+import { ServerAnalysisData } from "../global_data/GlobalData";
 
 let broker = new DataBroker()
 export async function main(ns:NS) {

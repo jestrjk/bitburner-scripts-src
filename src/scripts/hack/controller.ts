@@ -1,15 +1,9 @@
-import { HackableServer } from "./HackableServer"
-import { DataBroker } from "../global_data/data"
+import { data } from "../global_data/GlobalData"
 
-let broker = new DataBroker()
-
-let script_hosts = broker.script_hosts
-let all_servers = broker.all_servers
- 
 export async function main ( ns:NS ) {
   ns.tail() 
   
-  for ( let server of all_servers ) {
+  for ( let server of data.server_targets!.all_servers ) {
     let { validHackTarget, message } = serverIsValidHackTarget( server )
 
     if ( !validHackTarget ) {

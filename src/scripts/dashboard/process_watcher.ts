@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { DataBroker } from "../global_data/data"
-import {ServerList} from "../lib/ServerList"
+import { DataBroker } from "../global_data/GlobalData"
+import {ServerList} from "../global_data/ServerTargetList"
 import { disableNSFunctionLogging } from "../lib/utils"
 
 const config = {

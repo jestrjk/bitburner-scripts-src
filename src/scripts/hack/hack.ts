@@ -1,4 +1,4 @@
-import { DataBroker } from "../global_data/data"
+import { DataBroker } from "../global_data/GlobalData"
 
 export async function main(ns : NS) {
   try {

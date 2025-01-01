@@ -1,6 +1,6 @@
 /* eslint-disable */
 import {colors, disableNSFunctionLogging} from "../lib/utils"
-import { DataBroker } from "../global_data/data"
+import { DataBroker } from "../global_data/GlobalData"
 
 let optionsSchema:any = [
 	['hack_per_server_limit', 1],

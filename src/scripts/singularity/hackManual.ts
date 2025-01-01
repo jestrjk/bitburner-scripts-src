@@ -1,6 +1,6 @@
 import { ServerPath } from "../lib/ServerPath"
 import * as Flags from "../types/Flags"
-import { DataBroker } from "../global_data/data"
+import { DataBroker } from "../global_data/GlobalData"
 
 export type OptionsSchema   = [string, string | number | boolean | string[]][] 
 export type FlagsResult     = { [key: string]: ScriptArg | string[] }

@@ -1,4 +1,4 @@
-import { DataBroker } from "../global_data/data";
+import { DataBroker } from "../global_data/GlobalData";
 import * as FlagTypes from "../types/Flags"
 
 let broker = new DataBroker()

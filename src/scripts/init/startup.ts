@@ -22,15 +22,15 @@ export async function main(ns:NS) {
     }
   }
 
-  if ( !(script_host_maxram_ratio_desired >= 0 && script_host_maxram_ratio_desired <= 1) ) {
-    throw "ERROR You must supply a number between 0 and 1, representing a percentage for the hack mem ratio desired"
-  }
-  ns.tprint( `hackmanual ratio ${script_host_maxram_ratio_desired}`)
+  // if ( !(script_host_maxram_ratio_desired >= 0 && script_host_maxram_ratio_desired <= 1) ) {
+  //   throw "ERROR You must supply a number between 0 and 1, representing a percentage for the hack mem ratio desired"
+  // }
+  // ns.tprint( `hackmanual ratio ${script_host_maxram_ratio_desired}`)
 
-  let singularity_hack_manual_script_name = "/scripts/singularity/hackManual.ts"
+  // let singularity_hack_manual_script_name = "/scripts/singularity/hackManual.ts"
 
-  let hack_manual_threads = setupSingularityManualHackThreads(ns, singularity_hack_manual_script_name, script_host_maxram_ratio_desired)
-  ns.tprint ( `hack manual threads : ${hack_manual_threads}`)
+  // let hack_manual_threads = setupSingularityManualHackThreads(ns, singularity_hack_manual_script_name, script_host_maxram_ratio_desired)
+  // ns.tprint ( `hack manual threads : ${hack_manual_threads}`)
 
   //if ( hack_manual_threads !== 0 ) hack_manual_threads = <number>ns.args[0] 
   
@@ -43,12 +43,12 @@ export async function main(ns:NS) {
 
   let scripts:ScriptEntry[] = [
     { name: "dashboard/server_stats.ts",    threads: 1 },
-    { name: "dashboard/process_watcher.ts", threads: 1 },
+    //{ name: "dashboard/process_watcher.ts", threads: 1 },
     { name: "dashboard/money_perSecond.ts", threads: 1 },
     
-    { name: "singularity/hackManual.ts", args: ["--disable_best_select_algorithm"],   threads: 1500, nokill:true },
-    { name: "singularity/hackManual.ts",                                              threads: 2500, nokill:true },
-    { name: "hack/install.ts", args:["--disable_hack_calls", "--hack_per_server_limit", "10"],                   threads: 1 },
+    //{ name: "singularity/hackManual.ts", args: ["--disable_best_select_algorithm"],   threads: 1500, nokill:true },
+    //{ name: "singularity/hackManual.ts",                                              threads: 2500, nokill:true },
+    //{ name: "hack/install.ts", args:["--disable_hack_calls", "--hack_per_server_limit", "10"],                   threads: 1 },
   ]
  
   pre_scripts = pre_scripts.map(  script => { script.name = `${rootDir}/${script.name}`; return script } )

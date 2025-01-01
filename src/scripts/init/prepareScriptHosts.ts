@@ -1,4 +1,5 @@
-import { ServerList } from "../lib/ServerList";
+import { ServerTargetList } from "../global_data/ServerTargetList";
+import { ServerTarget } from "../global_data/ServerTarget";
 import { RootKit } from "../lib/RooKit";
 import { colors } from "../lib/utils";
 
@@ -13,10 +14,8 @@ export async function main(ns:NS) {
   ns.disableLog( "sqlinject")
   
   while(true) {
-    let sl = new ServerList(ns)
+    let sl = new ServerTargetList(ns)
     for( let server of sl.all_servers ) {
-      //ns.print( `${colors.brightBlue}${server.hostname}`)
-      //ns.print ( sl.all_servers.map( s=> s.hostname) )
       installScripts(ns, server)
       root_server(ns,server)
     }
@@ -24,7 +23,9 @@ export async function main(ns:NS) {
   }
 } // main()
 
-function installScripts( ns: NS,script_host: Server ) {
+function installScripts( ns: NS, scriptHostTarget: ServerTarget ) {
+  let script_host = scriptHostTarget.server
+
   if ( script_host.hasAdminRights) {
     let script_names_to_scp = ns.ls('home', ".ts")
     if ( ns.scp( script_names_to_scp, script_host.hostname, 'home' ) ) {
@@ -35,7 +36,9 @@ function installScripts( ns: NS,script_host: Server ) {
   }
 }
 
-function root_server( ns:NS, target_server: Server ) {
+function root_server( ns:NS, serverData: ServerTarget ) {
+  let target_server = serverData.server
+
   if ( target_server.hasAdminRights ) { return true } else {
     let root_kit = new RootKit(ns, target_server ) 
     let rooted = root_kit.run()
