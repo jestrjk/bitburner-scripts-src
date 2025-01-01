@@ -19,7 +19,7 @@ export async function main(ns : NS) {
 	ns.disableLog("sleep")
 
 	let arg_data = lib_args.processArguments( ns ) 
-	let hacking_level_limit = arg_data.options.limit 
+	//let hacking_level_limit = arg_data.options.limit 
 
 	ns.tail( ns.pid )
 	ns.moveTail( 1400, 0 )
@@ -32,13 +32,12 @@ export async function main(ns : NS) {
 
 		let all_servers: 	ServerTarget[] = data.server_targets.all_servers
 
-		let byHackingLevelLimit = ( server: any ) => ( server.hacking_level_required < hacking_level_limit ) 
+		//let byHackingLevelLimit = ( server: any ) => ( server.hacking_level_required < hacking_level_limit ) 
 
-		function sortByReqHackSkill_Ascending(a:any,b:any) { return ( a.requiredHackingSkill! - b.requiredHackingSkill!) }
-		function sortByReqHackSkill_Descending(a:any,b:any) { return ( b.requiredHackingSkill! - a.requiredHackingSkill!) }
-		
+		function sortByReqHackSkill_Ascending(a:ServerTarget,b:ServerTarget) { return ( a.server.requiredHackingSkill! - b.server.requiredHackingSkill!) }
+
 		let sorted_servers = all_servers.sort( sortByReqHackSkill_Ascending )
-
+		
 		let printHeaders = () => ns.print( 
 			`hostname`								.padEnd( 24 ) +
 			`diff`										.padEnd( 8 ) +
@@ -51,6 +50,7 @@ export async function main(ns : NS) {
 		)
 
 		printHeaders()
+
 		for( let serverData of sorted_servers )  {		
 			let s = serverData.server // because fuck you keyboard
 			

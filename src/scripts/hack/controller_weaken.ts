@@ -14,9 +14,18 @@ export async function main ( ns:NS ) {
 
   for ( let serverData of valid_hack_targets ) {
       let weaken_scripts = ns.ps( serverData.hostname )
+      
+      ns.print( `[${serverData.hostname}] weaken_scripts: ${weaken_scripts.length}` )
+      
+      for ( let weaken_script of weaken_scripts ) {
+        ns.print( `PS: ${weaken_script}` )
+      }
 
-      if ( weaken_scripts.find( p => p.filename == weaken_script_name && p.args[0] == serverData.hostname ) ){
-        ns.print( `[${serverData.hostname}] '${weaken_script_name}' already running` );
+      if ( weaken_scripts.find( p => 
+        (p.filename == weaken_script_name) && 
+        (p.args[0] == serverData.hostname) ) ){
+
+          ns.print( `[${serverData.hostname}] '${weaken_script_name}' already running` );
         continue;
       }
       
