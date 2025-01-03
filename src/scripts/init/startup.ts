@@ -37,7 +37,7 @@ export async function main(ns:NS) {
   let rootDir = "/scripts" 
 
   let pre_scripts:ScriptEntry[] = [
-    { name: "global_data/populate_data.ts", threads: 1 },
+    { name: "global_data/GlobalData.ts", threads: 1 },
     { name: "init/prepareScriptHosts.ts",   threads: 1 },
   ]
 

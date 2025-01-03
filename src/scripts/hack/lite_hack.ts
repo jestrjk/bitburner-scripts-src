@@ -1,13 +1,7 @@
-import { DataBroker } from "../global_data/GlobalData"
-
 export async function main(ns : NS) {
-  try {
-
     let target: string  = ns.args[0] as string
+    ns.print( `[${target}] hack...` )
 
     let hack_result = await ns.hack( target )
-
-  } catch(err) {throw err}
-  
 }
 
