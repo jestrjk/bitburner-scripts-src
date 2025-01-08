@@ -1,5 +1,5 @@
-import { ServerTargetList } from "../global_data/ServerTargetList";
-import { ServerTarget } from "../global_data/ServerTarget";
+import { GlobalData } from "../global_data/GlobalData";
+import { CustomServerData } from "../global_data/CustomServerData";
 import { RootKit } from "../lib/RooKit";
 import { colors } from "../lib/utils";
 
@@ -12,18 +12,19 @@ export async function main(ns:NS) {
   ns.disableLog( "relaysmtp")
   ns.disableLog( "httpworm")
   ns.disableLog( "sqlinject")
-  
+
   while(true) {
-    let sl = new ServerTargetList(ns)
-    for( let server of sl.all_servers ) {
+    let data = new GlobalData(ns)  
+    for( let server of data.server_targets.getScriptHosts() ) {
       installScripts(ns, server)
       root_server(ns,server)
     }
-    await ns.sleep( 1000 )
+
+    await ns.sleep( 5000 )
   }
 } // main()
 
-function installScripts( ns: NS, scriptHostTarget: ServerTarget ) {
+function installScripts( ns: NS, scriptHostTarget: CustomServerData ) {
   let script_host = scriptHostTarget.server
 
   if ( script_host.hasAdminRights) {
@@ -36,7 +37,7 @@ function installScripts( ns: NS, scriptHostTarget: ServerTarget ) {
   }
 }
 
-function root_server( ns:NS, serverData: ServerTarget ) {
+function root_server( ns:NS, serverData: CustomServerData ) {
   let target_server = serverData.server
 
   if ( target_server.hasAdminRights ) { return true } else {

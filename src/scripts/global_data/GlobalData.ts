@@ -1,10 +1,11 @@
-import { ServerTargetList } from "./ServerTargetList"
+import { CustomServerDataList } from "./CustomServerDataList"
 
 export interface ServerAction {
   hostname: string
   description: string
   expires: number
   timestamp: number
+  script_host?: string
 }
 
 export interface SingularityAction {
@@ -13,43 +14,30 @@ export interface SingularityAction {
   action:           string
   time_to_live:     number
 }
-   
-function refresh (ns:NS) {
-  data.server_targets = new ServerTargetList(ns)
-  data.player         = ns.getPlayer()
 
-  if ( !data.server_actions ) {
-    data.server_actions = []
+export interface _GlobalData {
+  server_actions: ServerAction[],
+}
+
+export class GlobalData {
+  constructor(ns:NS) {
+    this.ns = ns
+    this.server_targets = new CustomServerDataList(ns)
   }
-}
 
-function cleanServerActions () {
-  data.server_actions = data.server_actions!.filter( d=>(d.expires > Date.now()) )
-}
 
-export interface GlobalData {
-  server_targets: ServerTargetList
-  server_actions: ServerAction[]
-  player: Player
-}
+  ns:NS
+  server_targets: CustomServerDataList
+  server_actions: ServerAction[] = []
+  created: Date = new Date() 
 
-const data: Partial<GlobalData> = {}
-
-export function getData(): GlobalData {
-  return data as GlobalData
-}
-
-export async function main ( ns:NS ) { 
-  ns.tail()
-  ns.disableLog( "scan" )
-
-  while ( true ) {
-    refresh(ns)
-    cleanServerActions()
-
-    let now = new Date()
-    ns.print( now.toISOString() )
-    await ns.sleep(500) 
+  refresh() {
+    this.cleanServerActions()
+    this.server_targets = new CustomServerDataList( this.ns ) 
   }
+  
+  cleanServerActions () {
+    this.server_actions = this.server_actions.filter( d=>(d.expires > Date.now()) )
+  }
+  
 }
-

@@ -1,4 +1,17 @@
 
+2024 - 01 - 08
+
+went with controller_weaken / hack / grow
+
+Can grow hack and weaken with simple lite scripts
+
+Reorganizing global data into server_actions to feedback on the server_status list and the 
+server list it self. Should i continue to buffer the shit? or leave the expenses to controller_*.ts ? 
+
+I think controller_* is better, cause then i can split the controllers to different script hosts, if 
+i need to. Configuring controllers to script_hosts might be annoying...
+
+
 Dec=26-2024
 
 Started hack/controller.ts

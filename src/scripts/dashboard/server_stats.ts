@@ -1,11 +1,10 @@
 /* eslint-disable */
 import * as lib_args from '../lib/argumentProcessor'
+import { disableNSFunctionLogging } from '../lib/utils'
 import { colors, toMillionsFormatted } from '../lib/utils'
-import { ServerTarget } from '../global_data/ServerTarget'
+import { CustomServerData } from '../global_data/CustomServerData'
 
-import { getData } from '../global_data/GlobalData'
-
-
+import { GlobalData } from '../global_data/GlobalData'
 
 interface Server_Info_Extended extends Server {
 	weaken_time: number
@@ -15,8 +14,7 @@ interface Server_Info_Extended extends Server {
 
 /** @param {NS} ns */
 export async function main(ns : NS) {
-	ns.clearLog()
-	ns.disableLog("sleep")
+	disableNSFunctionLogging( ns )
 
 	let arg_data = lib_args.processArguments( ns ) 
 	//let hacking_level_limit = arg_data.options.limit 
@@ -25,16 +23,17 @@ export async function main(ns : NS) {
 	ns.moveTail( 1400, 0 )
 	ns.resizeTail( 1100, 600 )
 
-	let data = getData()
-
 	while ( true ) {
 		ns.clearLog()
 
-		let all_servers: 	ServerTarget[] = data.server_targets.all_servers
+		let data = new GlobalData( ns )
+		data.cleanServerActions()
+
+		let all_servers: 	CustomServerData[] = data.server_targets.all_servers
 
 		//let byHackingLevelLimit = ( server: any ) => ( server.hacking_level_required < hacking_level_limit ) 
 
-		function sortByReqHackSkill_Ascending(a:ServerTarget,b:ServerTarget) { return ( a.server.requiredHackingSkill! - b.server.requiredHackingSkill!) }
+		function sortByReqHackSkill_Ascending(a:CustomServerData,b:CustomServerData) { return ( a.server.requiredHackingSkill! - b.server.requiredHackingSkill!) }
 
 		let sorted_servers = all_servers.sort( sortByReqHackSkill_Ascending )
 		
@@ -81,7 +80,7 @@ export async function main(ns : NS) {
 		}
 
 		printHeaders()
-		ns.print( Date.now())
+		ns.print( new Date().toISOString() )
 
 		await ns.sleep( 200 )
 	}	// while(true)

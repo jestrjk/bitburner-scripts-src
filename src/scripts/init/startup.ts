@@ -37,7 +37,6 @@ export async function main(ns:NS) {
   let rootDir = "/scripts" 
 
   let pre_scripts:ScriptEntry[] = [
-    { name: "global_data/GlobalData.ts", threads: 1 },
     { name: "init/prepareScriptHosts.ts",   threads: 1 },
   ]
 
@@ -48,7 +47,7 @@ export async function main(ns:NS) {
     
     //{ name: "singularity/hackManual.ts", args: ["--disable_best_select_algorithm"],   threads: 1500, nokill:true },
     //{ name: "singularity/hackManual.ts",                                              threads: 2500, nokill:true },
-    //{ name: "hack/install.ts", args:["--disable_hack_calls", "--hack_per_server_limit", "10"],                   threads: 1 },
+    { name: "hack/controller_weaken.ts", threads: 1 },
   ]
  
   pre_scripts = pre_scripts.map(  script => { script.name = `${rootDir}/${script.name}`; return script } )

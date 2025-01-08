@@ -25,11 +25,11 @@ export async function main ( ns:NS ) {
         continue ;
       }
 
-      if ( growth_time > 60000 ) {
-        ns.print( `[${serverData.hostname}] Growth time too long: ${Math.floor( growth_time/1000 )}s` )
-        continue ;
+      if ( targetServer.hackDifficulty! > targetServer.minDifficulty! + 5 ) {
+        ns.print( `[${serverData.hostname}] Security too high: ${targetServer.hackDifficulty} > ${targetServer.minDifficulty! + 5}` )
+        continue;
       }
-
+      
       let growth_scripts = ns.ps( script_host.hostname )
       
       if ( growth_scripts.find( p => 

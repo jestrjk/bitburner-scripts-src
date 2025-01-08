@@ -44,6 +44,7 @@ export function disableNSFunctionLogging(ns:NS) {
   ns.disableLog( 'sleep' )  
   ns.disableLog( 'asleep' )  
 	ns.disableLog( `exec` )
+  ns.disableLog( `scan` )
 	ns.disableLog( `getServer` )
 	ns.disableLog( `getServerUsedRam` )
 	ns.disableLog( `getServerMaxRam` )
@@ -55,5 +56,4 @@ export function disableNSFunctionLogging(ns:NS) {
 	ns.disableLog( `weakenAnalyze` )
 	ns.disableLog( `getGrowTime` )
 	ns.disableLog( `growthAnalyze` )
-
 }
