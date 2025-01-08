@@ -1,23 +1,22 @@
-import { GlobalData} from "../global_data/GlobalData"
-
+import { data, getValidHackTargets, getScriptHosts, getBestScriptHost } from "../global_data/GlobalData"
+import { LiteScriptNames } from "../global_data/ServerData"
 
 export async function main ( ns:NS ) {
   ns.tail() 
   
-  let data = new GlobalData(ns)
-
   let weaken_script_name = 'scripts/hack/lite_weaken.ts'
   
   while (true) {
-       
-    for ( let server_data of data.server_targets!.getValidHackTargets() ) {
+    ns.clearLog()
+    
+    for ( let server_data of getValidHackTargets() ) {
 
-      if ( data.server_targets!.hostIsBeingWeakened(server_data.hostname) ) {
+      if ( server_data.isBeingManipulatedBy( ns, getScriptHosts(), LiteScriptNames.WEAKEN ) ) {
         ns.print( `[${server_data.hostname}] already weakeneding - skipping` );
         continue;
       }
 
-      let script_host = data.server_targets!.getBestScriptHost( ns.getScriptRam(weaken_script_name) )
+      let script_host = getBestScriptHost( ns.getScriptRam(weaken_script_name) )
 
       if ( !script_host ) { 
         ns.print( `[${server_data.hostname}] No Script Host - skipping` ) ;
@@ -31,11 +30,11 @@ export async function main ( ns:NS ) {
       
       let weaken_threads = Math.min( 100, Math.floor( server_data.difficultyDelta / 0.05 ) ) 
       let weakenTime = ns.getWeakenTime( server_data.hostname )
-      await ns.print( `[${server_data.hostname}] ${weakenTime}ms to weaken @ ${new Date().toISOString()}` )
+      ns.print( `[${server_data.hostname}] ${weakenTime}ms to weaken @ ${new Date().toISOString()}` )
       
-      let pid = await ns.exec( weaken_script_name, script_host.hostname, weaken_threads, server_data.hostname )
+      let pid = ns.exec( weaken_script_name, script_host.hostname, weaken_threads, server_data.hostname )
       if ( pid ) {
-        data.server_actions!.push( { 
+        data.server.actions.push( { 
           timestamp: Date.now(), 
           hostname: server_data.hostname,
           expires: Date.now() + weakenTime, 
@@ -45,7 +44,7 @@ export async function main ( ns:NS ) {
       }
 
     }
-    ns.print( new Date().toISOString())
+    ns.print( new Date().toISOString() )
     await ns.sleep(10000);
   }
 } 

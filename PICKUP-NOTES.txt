@@ -1,3 +1,10 @@
+2024 - 01 - 08 : 4pm
+
+hack, grow, weaken all work.
+need to format and move the tail()s around so they fit on the screen conveniently.
+need to optimize the selection of servers to hack
+need to grow the memory footprint to max memory
+need to make sure we are using all the script hosts
 
 2024 - 01 - 08
 

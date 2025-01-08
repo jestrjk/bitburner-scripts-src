@@ -1,30 +1,21 @@
 
-export interface ServerAnalysisData {
-  weakenAnalyseData:          number
-  growthAnalyzeData:          number
-  hack_time_required:         number
-  hack_money_ratio_stolen:    number
-  hack_success_chance:        number
-  hack_threads_for_75percent: number
-  grow_time_required:         number
-  running_scripts:            ProcessInfo[]
-}
-
 export enum LiteScriptNames {
   WEAKEN  = 'lite_weaken.ts',
   GROW    = 'lite_grow.ts', 
   HACK    = 'lite_hack.ts',
 }
 
-export class CustomServerData {
+
+export class ServerData {
   constructor(ns:NS, serverName:string ) {
     
-    this.ns = ns
     this.server = ns.getServer(serverName)
+    
+    this.availableRam = this.server.maxRam! - this.server.ramUsed!
   }
 
-  ns:NS
-  server: Server
+  server:Server
+  availableRam: number
 
   get hostname() { return this.server.hostname }
 
@@ -49,7 +40,23 @@ export class CustomServerData {
    * @returns {number} Current difficulty minus minimum difficulty
    */
   get difficultyDelta() { 
-    return Math.round(this.server.hackDifficulty! - this.server.minDifficulty!) 
+    return Math.round(this.server.hackDifficulty! - this.server.minDifficulty! ) 
   }
 
+  isBeingManipulatedBy( ns:NS, script_hosts: ServerData[], script_name: LiteScriptNames ) {
+    ns.print( `Checking if ${script_name} running on ${this.hostname}`)
+    for( let script_host of script_hosts ) {
+      let lite_scripts_running = ns.ps( script_host.hostname ).filter( 
+        p => p.filename.includes(script_name) &&
+        p.args[0] === this.hostname
+      )
+  
+      if ( lite_scripts_running.length > 0 ) {
+        ns.print( `Found ${this.hostname} ${script_name} scripts running on ${script_host.hostname}` )
+  
+        return true
+      }
+    }
+    return false 
+  }
 }

@@ -1,5 +1,5 @@
-import { GlobalData } from "../global_data/GlobalData";
-import { CustomServerData } from "../global_data/CustomServerData";
+import { getScriptHosts } from "../global_data/GlobalData";
+import { ServerData } from "../global_data/ServerData";
 import { RootKit } from "../lib/RooKit";
 import { colors } from "../lib/utils";
 
@@ -14,8 +14,8 @@ export async function main(ns:NS) {
   ns.disableLog( "sqlinject")
 
   while(true) {
-    let data = new GlobalData(ns)  
-    for( let server of data.server_targets.getScriptHosts() ) {
+    
+    for( let server of getScriptHosts() ) {
       installScripts(ns, server)
       root_server(ns,server)
     }
@@ -24,7 +24,7 @@ export async function main(ns:NS) {
   }
 } // main()
 
-function installScripts( ns: NS, scriptHostTarget: CustomServerData ) {
+function installScripts( ns: NS, scriptHostTarget: ServerData ) {
   let script_host = scriptHostTarget.server
 
   if ( script_host.hasAdminRights) {
@@ -37,7 +37,7 @@ function installScripts( ns: NS, scriptHostTarget: CustomServerData ) {
   }
 }
 
-function root_server( ns:NS, serverData: CustomServerData ) {
+function root_server( ns:NS, serverData: ServerData ) {
   let target_server = serverData.server
 
   if ( target_server.hasAdminRights ) { return true } else {

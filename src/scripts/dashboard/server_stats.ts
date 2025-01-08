@@ -2,9 +2,9 @@
 import * as lib_args from '../lib/argumentProcessor'
 import { disableNSFunctionLogging } from '../lib/utils'
 import { colors, toMillionsFormatted } from '../lib/utils'
-import { CustomServerData } from '../global_data/CustomServerData'
+import { ServerData } from '../global_data/ServerData'
 
-import { GlobalData } from '../global_data/GlobalData'
+import { data } from '../global_data/GlobalData'
 
 interface Server_Info_Extended extends Server {
 	weaken_time: number
@@ -26,14 +26,12 @@ export async function main(ns : NS) {
 	while ( true ) {
 		ns.clearLog()
 
-		let data = new GlobalData( ns )
-		data.cleanServerActions()
-
-		let all_servers: 	CustomServerData[] = data.server_targets.all_servers
+		let all_servers: 	ServerData[] = data.server.data
 
 		//let byHackingLevelLimit = ( server: any ) => ( server.hacking_level_required < hacking_level_limit ) 
 
-		function sortByReqHackSkill_Ascending(a:CustomServerData,b:CustomServerData) { return ( a.server.requiredHackingSkill! - b.server.requiredHackingSkill!) }
+		function sortByReqHackSkill_Ascending(a:ServerData,b:ServerData) { 
+			return ( a.server.requiredHackingSkill! - b.server.requiredHackingSkill!) }
 
 		let sorted_servers = all_servers.sort( sortByReqHackSkill_Ascending )
 		
@@ -58,7 +56,7 @@ export async function main(ns : NS) {
 			let line_color = colors.reset
 			if ( s.moneyMax === 0 ) line_color = colors.brightCyan
 			
-			let actions = data.server_actions.filter( a => a.hostname == serverData.hostname ).map( a => a.description )
+			let actions = data.server.actions.filter( a => a.hostname == serverData.hostname ).map( a => a.description )
 			let flagString = actions.sort().join("")
 
 			if ( flagString.length > 0 ) line_color = colors.brightMagenta

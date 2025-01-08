@@ -1,6 +1,5 @@
-import { getData } from "../global_data/GlobalData"
-
-let data = getData() 
+import { data } from "../global_data/GlobalData"
+import { getBestScriptHost } from "../global_data/GlobalData"
 
 const growth_script_name = 'scripts/hack/lite_grow.ts'
 
@@ -12,14 +11,14 @@ export async function main ( ns:NS ) {
     ns.clearLog()
     let time_start = Date.now()
 
-    for ( let serverData of data.server_targets!.all_servers ) {
+    for ( let serverData of data.server.data ) {
       let targetServer = serverData.server
       let growth_threads = Math.min ( 500, Math.floor(getGrowthThreads( ns, targetServer )))
       let growth_time    = ns.getGrowTime( serverData.hostname )
       
       if ( ! serverIsValidTarget( targetServer ).valid ) continue ;
 
-      let script_host = getBestScriptHost(ns, ns.getScriptRam(growth_script_name))
+      let script_host = getBestScriptHost( ns.getScriptRam(growth_script_name))
       if ( !script_host ) {
         ns.print( `[${serverData.hostname}] No Script Host` ) ; 
         continue ;
@@ -48,11 +47,12 @@ export async function main ( ns:NS ) {
       let pid = ns.exec( growth_script_name, script_host.hostname, growth_threads, serverData.hostname )
 
       if ( pid ) {
-        data.server_actions.push( { 
+        data.server.actions.push( { 
           timestamp: Date.now(), 
           hostname: serverData.hostname,
           expires: Date.now() + growth_time, 
           description: 'G',
+          script_host: script_host.hostname,
         } )
       }
     }
@@ -98,16 +98,3 @@ function serverIsValidTarget( server: Server ) {
   return { valid: true, message: "Valid Grow Target" }
 }
 
-function getBestScriptHost( ns:NS, required_ram: number ) {
-  for( let script_host of data.server_targets.getScriptHosts() ) {
-    let available_ram = script_host.server.maxRam - script_host.server.ramUsed
-
-    if ( available_ram > required_ram ) {
-      ns.print( `[${script_host.hostname}] has ${available_ram}gb for ${required_ram}gb script`)
-
-      return script_host
-    }
-  } 
-
-  return null 
-}
