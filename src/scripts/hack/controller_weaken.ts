@@ -8,18 +8,13 @@ export async function main ( ns:NS ) {
   
   while (true) {
     ns.clearLog()
-    
-    for ( let server_data of getValidHackTargets() ) {
 
+    let valid_hack_targets = getValidHackTargets()
+    for ( let server_data of valid_hack_targets ) {
+      ns.print( `[${server_data.hostname}]` )
+      
       if ( server_data.isBeingManipulatedBy( ns, getScriptHosts(), LiteScriptNames.WEAKEN ) ) {
-        ns.print( `[${server_data.hostname}] already weakeneding - skipping` );
-        continue;
-      }
-
-      let script_host = getBestScriptHost( ns.getScriptRam(weaken_script_name) )
-
-      if ( !script_host ) { 
-        ns.print( `[${server_data.hostname}] No Script Host - skipping` ) ;
+        ns.print( `[${server_data.hostname}] already weakening - skipping` );
         continue;
       }
       
@@ -28,7 +23,15 @@ export async function main ( ns:NS ) {
         continue;
       }
       
-      let weaken_threads = Math.min( 100, Math.floor( server_data.difficultyDelta / 0.05 ) ) 
+      let weaken_threads = Math.min( 1000, Math.floor( server_data.difficultyDelta / 0.05 ) ) 
+
+      let script_host = getBestScriptHost( ns, weaken_script_name, weaken_threads )
+
+      if ( !script_host ) { 
+        ns.print( `[${server_data.hostname}] No Script Host - skipping` ) ;
+        continue;
+      }
+
       let weakenTime = ns.getWeakenTime( server_data.hostname )
       ns.print( `[${server_data.hostname}] ${weakenTime}ms to weaken @ ${new Date().toISOString()}` )
       
@@ -36,6 +39,7 @@ export async function main ( ns:NS ) {
       if ( pid ) {
         data.server.actions.push( { 
           timestamp: Date.now(), 
+          threads: weaken_threads,
           hostname: server_data.hostname,
           expires: Date.now() + weakenTime, 
           description: 'W', // weaken
@@ -45,6 +49,6 @@ export async function main ( ns:NS ) {
 
     }
     ns.print( new Date().toISOString() )
-    await ns.sleep(10000);
+    await ns.sleep(1000);
   }
 } 

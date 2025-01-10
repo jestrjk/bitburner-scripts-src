@@ -12,7 +12,7 @@ export async function main ( ns:NS ) {
     // Print header
     ns.print("Server Actions:")
     ns.print("----------------------------------------")
-    ns.print("Server               | Action | Time Remaining | Script Host")
+    ns.print("Server               | Action | Time Remaining | Script Host | Threads")
     ns.print("----------------------------------------")
 
     // Print each action
@@ -23,7 +23,8 @@ export async function main ( ns:NS ) {
         `${action.hostname.padEnd(20)} | ` + 
         `${action.description.padEnd(6)} | ` + 
         `${time_str.padEnd(7)} | ` + 
-        `${action.script_host.padEnd(20)}` )
+        `${action.script_host.padEnd(20)}` +
+        `${action.threads}`) 
     }
 
     if (sorted_actions.length === 0) {

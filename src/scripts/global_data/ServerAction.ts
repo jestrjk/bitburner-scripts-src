@@ -1,10 +1,11 @@
 
 export class ServerAction {
   constructor( 
-    hostname:string , description: string, expires: number, 
+    hostname:string , threads: number, description: string, expires: number, 
     timestamp: number, script_host: string ) {
 
     this.hostname = hostname
+    this.threads = threads
     this.description = description
     this.expires = expires
     this.timestamp = timestamp
@@ -12,6 +13,7 @@ export class ServerAction {
   }
 
     hostname: string 
+    threads: number
     description: string
     expires: number
     timestamp: number

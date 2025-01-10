@@ -27,13 +27,7 @@ export async function main(ns : NS) {
 		ns.clearLog()
 
 		let all_servers: 	ServerData[] = data.server.data
-
-		//let byHackingLevelLimit = ( server: any ) => ( server.hacking_level_required < hacking_level_limit ) 
-
-		function sortByReqHackSkill_Ascending(a:ServerData,b:ServerData) { 
-			return ( a.server.requiredHackingSkill! - b.server.requiredHackingSkill!) }
-
-		let sorted_servers = all_servers.sort( sortByReqHackSkill_Ascending )
+		let sorted_servers = all_servers.sort( ( a, b ) => b.hackEfficiency - a.hackEfficiency )
 		
 		let printHeaders = () => ns.print( 
 			`hostname`								.padEnd( 24 ) +
@@ -43,7 +37,7 @@ export async function main(ns : NS) {
 			`$max`										.padEnd(12) + 
 			`difficulty`							.padEnd(12) +  
 			`adminrights`							.padEnd(12) +
-			`weaken/grow/hack times`	.padEnd(15) 
+			`hack eff`								.padEnd(15) 
 		)
 
 		printHeaders()
@@ -66,21 +60,19 @@ export async function main(ns : NS) {
 				`${s.hostname}`																					.padEnd(24) +
 				flagString								    													.padEnd(8) +
 				`${s.requiredHackingSkill}`															.padEnd(8) +
-				`${toMillionsFormatted( s.moneyAvailable as number )}`	.padEnd(12) +
-				`${toMillionsFormatted( s.moneyMax as number)}`					.padEnd(12) + 
+				`${toMillionsFormatted( s.moneyAvailable! )}`	.padEnd(12) +
+				`${toMillionsFormatted( s.moneyMax! )}`					.padEnd(12) + 
 				`${(s.hackDifficulty??-1).toFixed(0)}` 									.padEnd(6) +  
 				`${s.minDifficulty}`																		.padEnd(6) + 
-				`${hasAdminRights}(${s.numOpenPortsRequired??-1})`			.padEnd(12) // +
-				/*`${toMinutes(s.weaken_time)}`														.padEnd(5) +
-				`${toMinutes(s.grow_time)}`															.padEnd(5) +
-				`${toMinutes(s.hack_time)}(m)`													.padEnd(5) */
+				`${hasAdminRights}(${s.numOpenPortsRequired??-1})`			.padEnd(12) +
+				`${serverData.hackEfficiency.toFixed( 2 )}`												  .padEnd(5)
 			)
 		}
 
 		printHeaders()
 		ns.print( new Date().toISOString() )
 
-		await ns.sleep( 200 )
+		await ns.sleep( 1000 )
 	}	// while(true)
 
 	function pe( text: string, fixed_amount: number ) {

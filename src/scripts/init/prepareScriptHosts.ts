@@ -1,4 +1,4 @@
-import { getScriptHosts } from "../global_data/GlobalData";
+import { data, getScriptHosts } from "../global_data/GlobalData";
 import { ServerData } from "../global_data/ServerData";
 import { RootKit } from "../lib/RooKit";
 import { colors } from "../lib/utils";
@@ -15,9 +15,12 @@ export async function main(ns:NS) {
 
   while(true) {
     
+    for( let server of data.server.data) {
+      root_server(ns,server)
+    }
+    
     for( let server of getScriptHosts() ) {
       installScripts(ns, server)
-      root_server(ns,server)
     }
 
     await ns.sleep( 5000 )

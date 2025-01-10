@@ -44,6 +44,7 @@ export async function main(ns:NS) {
   let scripts:ScriptEntry[] = [
     { name: "dashboard/server_stats.ts",    threads: 1 },
     { name: "dashboard/server_actions_watcher.ts", threads: 1 },
+    { name: "dashboard/script_host_memory.ts", threads: 1 },
     { name: "dashboard/money_perSecond.ts", threads: 1 },
     
     //{ name: "singularity/hackManual.ts", args: ["--disable_best_select_algorithm"],   threads: 1500, nokill:true },

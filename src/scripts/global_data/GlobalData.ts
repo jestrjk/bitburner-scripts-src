@@ -16,7 +16,7 @@ export interface GlobalData {
   }
 }
 
-export const data: GlobalData = {
+export let data: GlobalData = {
   server: {
     names: [],
     data: [],
@@ -46,19 +46,26 @@ export function getScriptHosts() {
   return data.server.data.filter( s=>s.server.purchasedByPlayer )
 }
 
-export function getBestScriptHost( required_ram: number ) {
-  for( let script_host of getScriptHosts() ) {
+export function getBestScriptHost( ns:NS, script_name: string, threads: number = 1000 ) {
+  
+  let script_hosts = getScriptHosts()
+  for( let script_host of script_hosts ) {
+    let required_ram = threads * ns.getScriptRam(script_name, script_host.hostname )
     let available_ram = script_host.server.maxRam - script_host.server.ramUsed
+    
+    ns.print( `${script_host.hostname} has: ${available_ram} req:${required_ram}` +
+      `(${script_host.server.ramUsed}/${script_host.server.maxRam})` )
 
     if ( available_ram > required_ram ) {
+      ns.print( `{${script_host.hostname}} accepted: ${script_name} -t ${threads}` )
       return script_host
+    } else {
+      ns.print( `{${script_host.hostname}} rejected: ${script_name} -t ${threads}` )
     }
   } 
 
   return null
 }
-
-
 
 function recursiveServerScan(ns:NS, parent_host_name = 'home'): void {
   

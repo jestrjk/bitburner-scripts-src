@@ -1,5 +1,5 @@
 import { data } from "../global_data/GlobalData"
-import { getBestScriptHost } from "../global_data/GlobalData"
+import { getBestScriptHost, getValidHackTargets } from "../global_data/GlobalData"
 
 const growth_script_name = 'scripts/hack/lite_grow.ts'
 
@@ -11,14 +11,17 @@ export async function main ( ns:NS ) {
     ns.clearLog()
     let time_start = Date.now()
 
-    for ( let serverData of data.server.data ) {
+
+    let sorted_servers = getValidHackTargets().sort( (s1,s2) => s2.hackEfficiency - s1.hackEfficiency) 
+    for ( let serverData of sorted_servers ) {
+
       let targetServer = serverData.server
-      let growth_threads = Math.min ( 500, Math.floor(getGrowthThreads( ns, targetServer )))
+      let growth_threads = Math.min ( 1000, Math.floor(getGrowthThreads( ns, targetServer )))
       let growth_time    = ns.getGrowTime( serverData.hostname )
       
       if ( ! serverIsValidTarget( targetServer ).valid ) continue ;
 
-      let script_host = getBestScriptHost( ns.getScriptRam(growth_script_name))
+      let script_host = getBestScriptHost( ns, growth_script_name)
       if ( !script_host ) {
         ns.print( `[${serverData.hostname}] No Script Host` ) ; 
         continue ;
@@ -45,10 +48,11 @@ export async function main ( ns:NS ) {
       }
 
       let pid = ns.exec( growth_script_name, script_host.hostname, growth_threads, serverData.hostname )
-
+      
       if ( pid ) {
         data.server.actions.push( { 
           timestamp: Date.now(), 
+          threads: growth_threads,
           hostname: serverData.hostname,
           expires: Date.now() + growth_time, 
           description: 'G',
@@ -68,7 +72,8 @@ function getGrowthThreads ( ns:NS, target_host:Server) {
   let money_ratio = target_host.moneyMax! / target_host.moneyAvailable!
   let growth_threads = ns.growthAnalyze(target_host.hostname, money_ratio )
 
-  ns.print( `[${target_host.hostname}] growth_threads: ${growth_threads}` )
+  ns.print( `[${target_host.hostname}] Growth Threads: ${growth_threads}` )
+  
   return growth_threads
 }
 

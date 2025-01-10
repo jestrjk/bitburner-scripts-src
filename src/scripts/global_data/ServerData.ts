@@ -12,10 +12,30 @@ export class ServerData {
     this.server = ns.getServer(serverName)
     
     this.availableRam = this.server.maxRam! - this.server.ramUsed!
+    
+    this.moneyStolenPerHackThread   = ns.hackAnalyze( serverName )
+    this.hackChance                 = ns.hackAnalyzeChance( serverName )
+    this.hackTime                   = ns.getHackTime( serverName )
+
+    this.hackEfficiency             = this.hackChance * this.moneyStolenPerHackThread * this.server.moneyAvailable! / this.hackTime
+
+    this.analysis_data = {
+      processes: [],
+    }
   }
 
   server:Server
-  availableRam: number
+  availableRam:               number
+  moneyStolenPerHackThread:   number
+  hackChance:                 number
+  hackTime:                   number
+
+  hackEfficiency:             number
+
+  analysis_data: {
+    processes: ProcessInfo[],
+
+  }
 
   get hostname() { return this.server.hostname }
 
@@ -43,20 +63,22 @@ export class ServerData {
     return Math.round(this.server.hackDifficulty! - this.server.minDifficulty! ) 
   }
 
-  isBeingManipulatedBy( ns:NS, script_hosts: ServerData[], script_name: LiteScriptNames ) {
-    ns.print( `Checking if ${script_name} running on ${this.hostname}`)
+  analyse( ns:NS, script_hosts: ServerData[] ) {
+    this.analyseManipulationProcesses( ns, script_hosts ) 
+  }
+
+  analyseManipulationProcesses( ns:NS, script_hosts: ServerData[] ) {
+
+    this.analysis_data.processes = []
+
     for( let script_host of script_hosts ) {
       let lite_scripts_running = ns.ps( script_host.hostname ).filter( 
-        p => p.filename.includes(script_name) &&
-        p.args[0] === this.hostname
-      )
+        p => p.filename.includes('hack/lite_') && p.args[0] === this.hostname )
   
       if ( lite_scripts_running.length > 0 ) {
-        ns.print( `Found ${this.hostname} ${script_name} scripts running on ${script_host.hostname}` )
-  
-        return true
+        ns.print( `Found ${lite_scripts_running.length} '${lite_scripts_running.map( p => p.filename)}' scripts running on {${script_host.hostname}}` )
+        this.analysis_data.processes.concat( lite_scripts_running )
       }
     }
-    return false 
   }
 }

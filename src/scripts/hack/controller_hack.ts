@@ -1,4 +1,4 @@
-import { data } from "../global_data/GlobalData"
+import { data, getValidHackTargets } from "../global_data/GlobalData"
 import { getBestScriptHost } from "../global_data/GlobalData"
 
 const hack_script_name = 'scripts/hack/lite_hack.ts'
@@ -11,20 +11,22 @@ export async function main ( ns:NS ) {
     ns.clearLog()
     let time_start = Date.now()
 
-    for ( let serverData of data.server.data ) {
+    let sorted_servers = getValidHackTargets().sort( (s1,s2) => s2.hackEfficiency - s1.hackEfficiency) 
+    for ( let serverData of sorted_servers ) {
       
       let targetServer = serverData.server
       if ( ! serverIsValidTarget( targetServer ).valid ) continue ;
             
-      let hack_threads = Math.min(500, Math.floor(ns.hackAnalyzeThreads(serverData.hostname, targetServer.moneyAvailable! * 0.25)))
+      let hack_threads = Math.min(1000, Math.floor(ns.hackAnalyzeThreads(serverData.hostname, targetServer.moneyAvailable! * 0.35)))
       let hack_time = ns.getHackTime(serverData.hostname)
 
       if ( targetServer.moneyAvailable! < (targetServer.moneyMax! * 0.9) ) {
-        ns.print( `[${serverData.hostname}] Money too low: ${Math.floor(targetServer.moneyAvailable!/1000)}k/${Math.floor(targetServer.moneyMax!/1000)}k` )
+        ns.print( `[${serverData.hostname}] Money too low: ` + 
+          `${Math.floor(targetServer.moneyAvailable!/1000)}k/${Math.floor(targetServer.moneyMax!/1000)}k` )
         continue;
       }
             
-      let script_host = getBestScriptHost( ns.getScriptRam(hack_script_name))
+      let script_host = getBestScriptHost( ns, hack_script_name)
       if ( !script_host ) {
         ns.print( `[${serverData.hostname}] No Script Host` ) ; 
         continue ;
@@ -50,6 +52,7 @@ export async function main ( ns:NS ) {
       if ( pid ) {
         data.server.actions.push( { 
           timestamp: Date.now(), 
+          threads: hack_threads,
           hostname: serverData.hostname,
           expires: Date.now() + hack_time, 
           description: 'H',
